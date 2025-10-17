@@ -23,8 +23,15 @@ Public Class SerialPortForm
         SerialPort1.Write(data, 0, 1) 'send bytes as array, start at index 0, send 1 byte
     End Sub
 
-    Sub WriteToInput()
+    Sub Output_High()
         Dim data(1) As Byte 'put bytes into array
+        data(0) = &H20
+        data(1) = &HFF
+        SerialPort1.Write(data, 0, 2)
+    End Sub
+
+    Sub Output_Low()
+        Dim data(1) As Byte
         data(0) = &H20
         data(1) = &H0
         SerialPort1.Write(data, 0, 2)
@@ -79,10 +86,27 @@ Public Class SerialPortForm
 
     End Sub
 
-    Private Sub SendInputDataButton_Click(sender As Object, e As EventArgs) Handles SendInputDataButton.Click
+    Private Sub HighOutputButton_Click(sender As Object, e As EventArgs) Handles HighOutputButton.Click
         Connect()
-        WriteToInput()
+        Output_High()
         'SerialPort1.Open()
 
+    End Sub
+
+    Private Sub LowOutputButton_Click(sender As Object, e As EventArgs) Handles LowOutputButton.Click
+        Connect()
+        Output_Low()
+    End Sub
+
+    Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
+        Dim CurrentCount As Integer
+
+        CurrentCount += 1
+
+
+
+        If CurrentCount >= 8 Then
+            CurrentCount = 0
+        End If
     End Sub
 End Class

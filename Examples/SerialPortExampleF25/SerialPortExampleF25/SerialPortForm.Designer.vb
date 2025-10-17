@@ -27,11 +27,11 @@ Partial Class SerialPortForm
         Me.SerialPort1 = New System.IO.Ports.SerialPort(Me.components)
         Me.InputTextBox = New System.Windows.Forms.TextBox()
         Me.InputLabel = New System.Windows.Forms.Label()
-        Me.SendInputDataButton = New System.Windows.Forms.Button()
+        Me.HighOutputButton = New System.Windows.Forms.Button()
         Me.Timer = New System.Windows.Forms.Timer(Me.components)
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
-        Me.NotSendButton = New System.Windows.Forms.Button()
+        Me.LowOutputButton = New System.Windows.Forms.Button()
         Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -54,14 +54,14 @@ Partial Class SerialPortForm
         Me.InputLabel.TabIndex = 1
         Me.InputLabel.Text = "Input"
         '
-        'SendInputDataButton
+        'HighOutputButton
         '
-        Me.SendInputDataButton.Location = New System.Drawing.Point(167, 47)
-        Me.SendInputDataButton.Name = "SendInputDataButton"
-        Me.SendInputDataButton.Size = New System.Drawing.Size(75, 73)
-        Me.SendInputDataButton.TabIndex = 2
-        Me.SendInputDataButton.Text = "Send Input Data"
-        Me.SendInputDataButton.UseVisualStyleBackColor = True
+        Me.HighOutputButton.Location = New System.Drawing.Point(167, 47)
+        Me.HighOutputButton.Name = "HighOutputButton"
+        Me.HighOutputButton.Size = New System.Drawing.Size(75, 73)
+        Me.HighOutputButton.TabIndex = 2
+        Me.HighOutputButton.Text = "High Button"
+        Me.HighOutputButton.UseVisualStyleBackColor = True
         '
         'Timer
         '
@@ -86,23 +86,23 @@ Partial Class SerialPortForm
         Me.ToolStripDropDownButton1.Size = New System.Drawing.Size(42, 28)
         Me.ToolStripDropDownButton1.Text = "ToolStripDropDownButton1"
         '
-        'NotSendButton
+        'LowOutputButton
         '
-        Me.NotSendButton.Location = New System.Drawing.Point(333, 47)
-        Me.NotSendButton.Name = "NotSendButton"
-        Me.NotSendButton.Size = New System.Drawing.Size(81, 73)
-        Me.NotSendButton.TabIndex = 4
-        Me.NotSendButton.Text = "Not Send"
-        Me.NotSendButton.UseVisualStyleBackColor = True
+        Me.LowOutputButton.Location = New System.Drawing.Point(333, 47)
+        Me.LowOutputButton.Name = "LowOutputButton"
+        Me.LowOutputButton.Size = New System.Drawing.Size(81, 73)
+        Me.LowOutputButton.TabIndex = 4
+        Me.LowOutputButton.Text = "Low Button"
+        Me.LowOutputButton.UseVisualStyleBackColor = True
         '
         'SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(655, 375)
-        Me.Controls.Add(Me.NotSendButton)
+        Me.Controls.Add(Me.LowOutputButton)
         Me.Controls.Add(Me.StatusStrip1)
-        Me.Controls.Add(Me.SendInputDataButton)
+        Me.Controls.Add(Me.HighOutputButton)
         Me.Controls.Add(Me.InputLabel)
         Me.Controls.Add(Me.InputTextBox)
         Me.Margin = New System.Windows.Forms.Padding(2)
@@ -118,9 +118,9 @@ Partial Class SerialPortForm
     Friend WithEvents SerialPort1 As IO.Ports.SerialPort
     Friend WithEvents InputTextBox As TextBox
     Friend WithEvents InputLabel As Label
-    Friend WithEvents SendInputDataButton As Button
+    Friend WithEvents HighOutputButton As Button
     Friend WithEvents Timer As Timer
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents ToolStripDropDownButton1 As ToolStripDropDownButton
-    Friend WithEvents NotSendButton As Button
+    Friend WithEvents LowOutputButton As Button
 End Class
