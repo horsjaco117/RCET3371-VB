@@ -15,10 +15,19 @@ Public Class SerialPortForm
 
     End Sub
 
+
+
     Sub Write()
         Dim data(0) As Byte 'put bytes into array
         data(0) = &B11110000 'actual data as a byte
         SerialPort1.Write(data, 0, 1) 'send bytes as array, start at index 0, send 1 byte
+    End Sub
+
+    Sub WriteToInput()
+        Dim data(1) As Byte 'put bytes into array
+        data(0) = &H20
+        data(1) = &H0
+        SerialPort1.Write(data, 0, 2)
     End Sub
 
     Sub Read()
@@ -30,22 +39,22 @@ Public Class SerialPortForm
             Console.WriteLine($"Byte {i}: {Chr(data(i))}")
         Next
 
-        Console.WriteLine($"Is this Q@ Board: {IsQuietBoard(data)}")
+        ' Console.WriteLine($"Is this Q@ Board: {IsQuietBoard(data)}")
         Console.WriteLine(UBound(data))
 
     End Sub
 
-    Function IsQuietBoard(data() As Byte) As Boolean
+    'Function IsQuietBoard(data() As Byte) As Boolean
 
 
-        If UBound(data) = 64 And Chr(data(60)) = "@" Then
-            Return True
-        Else
-            Return False
-        End If
+    '    If UBound(data) = 64 And Chr(data(60)) = "@" Then
+    '        Return True
+    '    Else
+    '        Return False
+    '    End If
 
 
-    End Function
+    'End Function
 
     Function CheckIfQuietBoard() As Boolean
         Dim bytes(0) As Byte
@@ -67,6 +76,13 @@ Public Class SerialPortForm
         End Try
 
         Read()
+
+    End Sub
+
+    Private Sub SendInputDataButton_Click(sender As Object, e As EventArgs) Handles SendInputDataButton.Click
+        Connect()
+        WriteToInput()
+        'SerialPort1.Open()
 
     End Sub
 End Class
