@@ -111,41 +111,46 @@ Public Class SerialPortForm
 
 
         Select Case CurrentCount
-            Case 0
-                Output_High()
-                byteToSend(0) = &H20
-                byteToSend(1) = &HF1
-                SerialPort1.Write(byteToSend, 0, 2)
             Case 1
-                Output_Low()
+                'Output_High()
                 byteToSend(0) = &H20
-                byteToSend(1) = &HF2
+                byteToSend(1) = &H1
                 SerialPort1.Write(byteToSend, 0, 2)
             Case 2
-                Output_High()
+                ' Output_Low()
                 byteToSend(0) = &H20
-                byteToSend(1) = &HF3
+                byteToSend(1) = &H2
                 SerialPort1.Write(byteToSend, 0, 2)
             Case 3
-                Output_Low()
+                ' Output_High()
                 byteToSend(0) = &H20
-                byteToSend(1) = &HF4
+                byteToSend(1) = &H4
+                SerialPort1.Write(byteToSend, 0, 2)
             Case 4
-                Output_High()
+                ' Output_Low()
                 byteToSend(0) = &H20
-                byteToSend(1) = &HF5
+                byteToSend(1) = &H8
+                SerialPort1.Write(byteToSend, 0, 2)
             Case 5
-                Output_Low()
+                'Output_High()
                 byteToSend(0) = &H20
-                byteToSend(1) = &HF6
+                byteToSend(1) = &H10
+                SerialPort1.Write(byteToSend, 0, 2)
             Case 6
-                Output_High()
+                ' Output_Low()
                 byteToSend(0) = &H20
-                byteToSend(1) = &HF7
+                byteToSend(1) = &H20
+                SerialPort1.Write(byteToSend, 0, 2)
             Case 7
-                Output_High()
+                ' Output_High()
                 byteToSend(0) = &H20
-                byteToSend(1) = &HF8
+                byteToSend(1) = &H40
+                SerialPort1.Write(byteToSend, 0, 2)
+            Case 8
+                ' Output_High()
+                byteToSend(0) = &H20
+                byteToSend(1) = &H80
+                SerialPort1.Write(byteToSend, 0, 2)
             Case Else
                 'Return ' Exit if CurrentCount is not 0 or 1
         End Select
@@ -156,7 +161,7 @@ Public Class SerialPortForm
         data(0) = byteToSend(0)
         SerialPort1.Write(data, 0, 1)
 
-        If CurrentCount >= 7 Then
+        If CurrentCount >= 8 Then
             CurrentCount = 0
         End If
     End Sub
