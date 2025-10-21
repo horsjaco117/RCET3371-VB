@@ -1,6 +1,8 @@
 ﻿Imports System.IO.Ports
 
 Public Class SerialPortForm
+    Private CurrentCount As Integer = 0
+
 
     Sub Connect()
 
@@ -99,14 +101,72 @@ Public Class SerialPortForm
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
-        Dim CurrentCount As Integer
+        ' Dim CurrentCount As Integer
+        Connect()
+        'CheckIfQuietBoard()
 
         CurrentCount += 1
 
+        Dim byteToSend(1) As Byte
 
 
-        If CurrentCount >= 8 Then
+        Select Case CurrentCount
+            Case 0
+                Output_High()
+                byteToSend(0) = &H20
+                byteToSend(1) = &HF1
+                SerialPort1.Write(byteToSend, 0, 2)
+            Case 1
+                Output_Low()
+                byteToSend(0) = &H20
+                byteToSend(1) = &HF2
+                SerialPort1.Write(byteToSend, 0, 2)
+            Case 2
+                Output_High()
+                byteToSend(0) = &H20
+                byteToSend(1) = &HF3
+                SerialPort1.Write(byteToSend, 0, 2)
+            Case 3
+                Output_Low()
+                byteToSend(0) = &H20
+                byteToSend(1) = &HF4
+            Case 4
+                Output_High()
+                byteToSend(0) = &H20
+                byteToSend(1) = &HF5
+            Case 5
+                Output_Low()
+                byteToSend(0) = &H20
+                byteToSend(1) = &HF6
+            Case 6
+                Output_High()
+                byteToSend(0) = &H20
+                byteToSend(1) = &HF7
+            Case 7
+                Output_High()
+                byteToSend(0) = &H20
+                byteToSend(1) = &HF8
+            Case Else
+                'Return ' Exit if CurrentCount is not 0 or 1
+        End Select
+
+        Dim data(0) As Byte
+        'Dim data(1) As Byte
+        ' data(1) = byteToSend(1)
+        data(0) = byteToSend(0)
+        SerialPort1.Write(data, 0, 1)
+
+        If CurrentCount >= 7 Then
             CurrentCount = 0
         End If
+    End Sub
+
+    Sub RingCounter()
+
+    End Sub
+
+    Private Sub RingCounterButton_Click(sender As Object, e As EventArgs) Handles RingCounterButton.Click
+        'RingCounter()
+
     End Sub
 End Class

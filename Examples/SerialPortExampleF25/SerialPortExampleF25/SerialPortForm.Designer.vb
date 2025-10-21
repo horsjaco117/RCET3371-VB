@@ -32,6 +32,7 @@ Partial Class SerialPortForm
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
         Me.LowOutputButton = New System.Windows.Forms.Button()
+        Me.RingCounterButton = New System.Windows.Forms.Button()
         Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -65,6 +66,7 @@ Partial Class SerialPortForm
         '
         'Timer
         '
+        Me.Timer.Enabled = True
         Me.Timer.Interval = 500
         '
         'StatusStrip1
@@ -95,11 +97,21 @@ Partial Class SerialPortForm
         Me.LowOutputButton.Text = "Low Button"
         Me.LowOutputButton.UseVisualStyleBackColor = True
         '
+        'RingCounterButton
+        '
+        Me.RingCounterButton.Location = New System.Drawing.Point(178, 154)
+        Me.RingCounterButton.Name = "RingCounterButton"
+        Me.RingCounterButton.Size = New System.Drawing.Size(75, 68)
+        Me.RingCounterButton.TabIndex = 5
+        Me.RingCounterButton.Text = "RingCounter"
+        Me.RingCounterButton.UseVisualStyleBackColor = True
+        '
         'SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(655, 375)
+        Me.Controls.Add(Me.RingCounterButton)
         Me.Controls.Add(Me.LowOutputButton)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.HighOutputButton)
@@ -123,4 +135,5 @@ Partial Class SerialPortForm
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents ToolStripDropDownButton1 As ToolStripDropDownButton
     Friend WithEvents LowOutputButton As Button
+    Friend WithEvents RingCounterButton As Button
 End Class
