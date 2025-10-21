@@ -7,11 +7,11 @@ Public Class SerialPortForm
     Sub Connect()
 
         SerialPort1.Close()
-        SerialPort1.BaudRate = 115200 'Q@ Board Default
+        SerialPort1.BaudRate = 9600 'Q@ Board Default
         SerialPort1.Parity = Parity.None
         SerialPort1.StopBits = StopBits.One
         SerialPort1.DataBits = 8
-        SerialPort1.PortName = "COM4"
+        SerialPort1.PortName = "COM5"
 
         SerialPort1.Open()
 
