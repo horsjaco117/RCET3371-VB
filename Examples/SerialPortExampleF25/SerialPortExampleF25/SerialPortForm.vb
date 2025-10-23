@@ -1,7 +1,11 @@
 ﻿Imports System.IO.Ports
 
 Public Class SerialPortForm
-    ' Removed Private CurrentCount As Integer = 0 since the TrackBar handles the indexing
+    ' --- NEW: Ring Counter State & Timer ---
+    Private WithEvents RingTimer As New System.Windows.Forms.Timer()
+    ' Tracks the current index (1-6) for the ring counter sequence
+    Private RingCounterStep As Integer = 1
+    ' ---------------------------------------
 
     ' This method now checks if the port is open before attempting to configure and open it.
     Sub Connect()
@@ -27,6 +31,10 @@ Public Class SerialPortForm
 
     ' The form's Load event is the best place to call Connect initially.
     Private Sub SerialPortForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' Initialize the Ring Counter Timer
+        RingTimer.Interval = 100 ' Set rotation speed to 250ms (4 steps per second)
+        RingTimer.Enabled = False ' Start disabled
+
         Connect()
     End Sub
 
@@ -47,8 +55,10 @@ Public Class SerialPortForm
             Case 4 : byteToSend(0) = &H24 : byteToSend(1) = &H8
             Case 5 : byteToSend(0) = &H24 : byteToSend(1) = &H10
             Case 6 : byteToSend(0) = &H24 : byteToSend(1) = &H20
-            Case 7 : byteToSend(0) = &H24 : byteToSend(1) = &H40
-            Case 8 : byteToSend(0) = &H24 : byteToSend(1) = &H80
+            Case 7 ' All Low / All Off
+                byteToSend(0) = &H24 : byteToSend(1) = &H0
+            Case 8 ' All High / All On
+                byteToSend(0) = &H24 : byteToSend(1) = &HFF
             Case Else
                 Console.WriteLine($"Invalid index: {caseIndex}")
                 Return
@@ -70,25 +80,13 @@ Public Class SerialPortForm
     End Sub
 
     Sub Output_High()
-        If SerialPort1.IsOpen Then
-            Dim data(1) As Byte 'put bytes into array
-            data(0) = &H24
-            data(1) = &HFF
-            SerialPort1.Write(data, 0, 2)
-        Else
-            Console.WriteLine("Error: Cannot Output_High. COM port is closed.")
-        End If
+        ' Now calls SendCommand Case 8 (All High)
+        SendCommand(8)
     End Sub
 
     Sub Output_Low()
-        If SerialPort1.IsOpen Then
-            Dim data(1) As Byte
-            data(0) = &H24
-            data(1) = &H0
-            SerialPort1.Write(data, 0, 2)
-        Else
-            Console.WriteLine("Error: Cannot Output_Low. COM port is closed.")
-        End If
+        ' Now calls SendCommand Case 7 (All Low)
+        SendCommand(7)
     End Sub
 
     Sub Read()
@@ -122,6 +120,35 @@ Public Class SerialPortForm
         End If
     End Function
 
+    ' --- Ring Counter Logic ---
+    Sub RingCounter()
+        If RingTimer.Enabled Then
+            RingTimer.Stop()
+            ' Stop the rotation and turn all outputs OFF (Case 7)
+            SendCommand(7)
+            Console.WriteLine("Ring Counter Stopped.")
+        Else
+            ' Reset the step to start at the first output (Case 1)
+            RingCounterStep = 1
+            RingTimer.Start()
+            Console.WriteLine("Ring Counter Started.")
+        End If
+    End Sub
+
+    ' Event handler that fires every time the RingTimer interval elapses
+    Private Sub RingTimer_Tick(sender As Object, e As EventArgs) Handles RingTimer.Tick
+        ' The ring counter cycles through Cases 1 through 6
+        If RingCounterStep > 8 Then
+            RingCounterStep = 1 ' Wrap back to the first step
+        End If
+
+        ' Send the command for the current step
+        SendCommand(RingCounterStep)
+
+        ' Move to the next step
+        RingCounterStep += 1
+    End Sub
+
     ' --- Event Handlers ---
 
     Private Sub SerialPortForm_Click(sender As Object, e As EventArgs) Handles Me.Click
@@ -146,22 +173,19 @@ Public Class SerialPortForm
         Output_Low()
     End Sub
 
-    ' THE TIMER_TICK EVENT IS NOW COMMENTED OUT/REMOVED to prevent interference with the TrackBar.
-    ' Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
-    '     ' ... (Timer logic was here) ...
-    ' End Sub
-
     ' NEW: TrackBar Scroll Event Handler
     Private Sub TrackBar1_Scroll(sender As Object, e As EventArgs) Handles TrackBar1.Scroll
+        ' Stop the ring counter if the user manually adjusts the output
+        If RingTimer.Enabled Then
+            RingTimer.Stop()
+            Console.WriteLine("Ring Counter Stopped by TrackBar input.")
+        End If
         ' This sends the command whenever the TrackBar position changes.
         SendCommand(TrackBar1.Value)
     End Sub
 
-    Sub RingCounter()
-    End Sub
-
     Private Sub RingCounterButton_Click(sender As Object, e As EventArgs) Handles RingCounterButton.Click
-        'RingCounter()
+        RingCounter()
     End Sub
 
     ' Ensure the port is closed when the form closes
