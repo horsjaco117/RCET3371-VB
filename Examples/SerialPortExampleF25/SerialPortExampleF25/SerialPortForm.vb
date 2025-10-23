@@ -1,10 +1,9 @@
 ﻿Imports System.IO.Ports
 
 Public Class SerialPortForm
-    Private CurrentCount As Integer = 0
+    ' Removed Private CurrentCount As Integer = 0 since the TrackBar handles the indexing
 
     ' This method now checks if the port is open before attempting to configure and open it.
-    ' It should only be called once at startup or when a dedicated Connect button is clicked.
     Sub Connect()
         If Not SerialPort1.IsOpen Then
             ' Set port configuration
@@ -29,6 +28,35 @@ Public Class SerialPortForm
     ' The form's Load event is the best place to call Connect initially.
     Private Sub SerialPortForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Connect()
+    End Sub
+
+    ' New: Centralized function to handle the serial write logic based on an index (1-8).
+    Sub SendCommand(ByVal caseIndex As Integer)
+        If Not SerialPort1.IsOpen Then
+            Console.WriteLine("Command skipped: COM port is closed.")
+            Return
+        End If
+
+        Dim byteToSend(1) As Byte
+
+        ' The caseIndex (from 1 to 8) now determines which command is sent.
+        Select Case caseIndex
+            Case 1 : byteToSend(0) = &H24 : byteToSend(1) = &H1
+            Case 2 : byteToSend(0) = &H24 : byteToSend(1) = &H2
+            Case 3 : byteToSend(0) = &H24 : byteToSend(1) = &H4
+            Case 4 : byteToSend(0) = &H24 : byteToSend(1) = &H8
+            Case 5 : byteToSend(0) = &H24 : byteToSend(1) = &H10
+            Case 6 : byteToSend(0) = &H24 : byteToSend(1) = &H20
+            Case 7 : byteToSend(0) = &H24 : byteToSend(1) = &H40
+            Case 8 : byteToSend(0) = &H24 : byteToSend(1) = &H80
+            Case Else
+                Console.WriteLine($"Invalid index: {caseIndex}")
+                Return
+        End Select
+
+        ' Write the 2-byte command
+        SerialPort1.Write(byteToSend, 0, 2)
+        Console.WriteLine($"Sent command for Case {caseIndex} (Value: &H{byteToSend(1).ToString("X2")})")
     End Sub
 
     Sub Write()
@@ -96,7 +124,6 @@ Public Class SerialPortForm
 
     ' --- Event Handlers ---
 
-    ' Now only writes, relying on Connect() being called once at form load
     Private Sub SerialPortForm_Click(sender As Object, e As EventArgs) Handles Me.Click
         Write()
     End Sub
@@ -111,55 +138,25 @@ Public Class SerialPortForm
         Read() ' Read the available data
     End Sub
 
-    ' Calls Output_High, no need to call Connect() or Open() again
     Private Sub HighOutputButton_Click(sender As Object, e As EventArgs) Handles HighOutputButton.Click
         Output_High()
     End Sub
 
-    ' Calls Output_Low, no need to call Connect() again
     Private Sub LowOutputButton_Click(sender As Object, e As EventArgs) Handles LowOutputButton.Click
         Output_Low()
     End Sub
 
-    ' The Timer_Tick event is critical. It must NOT call Connect() repeatedly.
-    Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
-        If Not SerialPort1.IsOpen Then
-            Console.WriteLine("Timer tick skipped: COM port is closed.")
-            Return ' Exit if the port isn't open
-        End If
+    ' THE TIMER_TICK EVENT IS NOW COMMENTED OUT/REMOVED to prevent interference with the TrackBar.
+    ' Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
+    '     ' ... (Timer logic was here) ...
+    ' End Sub
 
-        CurrentCount += 1
-
-        Dim byteToSend(1) As Byte
-
-        Select Case CurrentCount
-            Case 1 : byteToSend(0) = &H24 : byteToSend(1) = &H1F
-            Case 2 : byteToSend(0) = &H24 : byteToSend(1) = &H20
-            Case 3 : byteToSend(0) = &H24 : byteToSend(1) = &H4F
-            Case 4 : byteToSend(0) = &H24 : byteToSend(1) = &H80
-            Case 5 : byteToSend(0) = &H24 : byteToSend(1) = &H1F
-            Case 6 : byteToSend(0) = &H24 : byteToSend(1) = &H20
-            Case 7 : byteToSend(0) = &H24 : byteToSend(1) = &H4F
-            Case 8 : byteToSend(0) = &H24 : byteToSend(1) = &H80
-            Case Else : Return
-        End Select
-
-        ' Write the 2-byte command
-        SerialPort1.Write(byteToSend, 0, 2)
-
-        ' Your original code had this redundant 1-byte write right after the 2-byte write.
-        ' Assuming the 2-byte write is the intended command, this 1-byte write is removed.
-        ' If you need the 1-byte write, you can uncomment and adjust it:
-        ' Dim data(0) As Byte
-        ' data(0) = byteToSend(0)
-        ' SerialPort1.Write(data, 0, 1) 
-
-        If CurrentCount >= 8 Then
-            CurrentCount = 0
-        End If
+    ' NEW: TrackBar Scroll Event Handler
+    Private Sub TrackBar1_Scroll(sender As Object, e As EventArgs) Handles TrackBar1.Scroll
+        ' This sends the command whenever the TrackBar position changes.
+        SendCommand(TrackBar1.Value)
     End Sub
 
-    ' RingCounter and RingCounterButton methods remain as placeholders
     Sub RingCounter()
     End Sub
 
@@ -173,5 +170,4 @@ Public Class SerialPortForm
             SerialPort1.Close()
         End If
     End Sub
-
 End Class

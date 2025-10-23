@@ -33,7 +33,9 @@ Partial Class SerialPortForm
         Me.ToolStripDropDownButton1 = New System.Windows.Forms.ToolStripDropDownButton()
         Me.LowOutputButton = New System.Windows.Forms.Button()
         Me.RingCounterButton = New System.Windows.Forms.Button()
+        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
         Me.StatusStrip1.SuspendLayout()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'SerialPort1
@@ -106,11 +108,24 @@ Partial Class SerialPortForm
         Me.RingCounterButton.Text = "RingCounter"
         Me.RingCounterButton.UseVisualStyleBackColor = True
         '
+        'TrackBar1
+        '
+        Me.TrackBar1.LargeChange = 1
+        Me.TrackBar1.Location = New System.Drawing.Point(26, 121)
+        Me.TrackBar1.Maximum = 8
+        Me.TrackBar1.Minimum = 1
+        Me.TrackBar1.Name = "TrackBar1"
+        Me.TrackBar1.Orientation = System.Windows.Forms.Orientation.Vertical
+        Me.TrackBar1.Size = New System.Drawing.Size(69, 137)
+        Me.TrackBar1.TabIndex = 6
+        Me.TrackBar1.Value = 1
+        '
         'SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(655, 375)
+        Me.Controls.Add(Me.TrackBar1)
         Me.Controls.Add(Me.RingCounterButton)
         Me.Controls.Add(Me.LowOutputButton)
         Me.Controls.Add(Me.StatusStrip1)
@@ -122,6 +137,7 @@ Partial Class SerialPortForm
         Me.Text = "Form1"
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
+        CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -136,4 +152,5 @@ Partial Class SerialPortForm
     Friend WithEvents ToolStripDropDownButton1 As ToolStripDropDownButton
     Friend WithEvents LowOutputButton As Button
     Friend WithEvents RingCounterButton As Button
+    Friend WithEvents TrackBar1 As TrackBar
 End Class
