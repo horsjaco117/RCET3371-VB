@@ -3,175 +3,175 @@
 Public Class SerialPortForm
     Private CurrentCount As Integer = 0
 
-
+    ' This method now checks if the port is open before attempting to configure and open it.
+    ' It should only be called once at startup or when a dedicated Connect button is clicked.
     Sub Connect()
+        If Not SerialPort1.IsOpen Then
+            ' Set port configuration
+            SerialPort1.BaudRate = 9600 'Q@ Board Default
+            SerialPort1.Parity = Parity.None
+            SerialPort1.StopBits = StopBits.One
+            SerialPort1.DataBits = 8
+            SerialPort1.PortName = "COM5"
 
-        SerialPort1.Close()
-        SerialPort1.BaudRate = 9600 'Q@ Board Default
-        SerialPort1.Parity = Parity.None
-        SerialPort1.StopBits = StopBits.One
-        SerialPort1.DataBits = 8
-        SerialPort1.PortName = "COM5"
-
-        SerialPort1.Open()
-
+            Try
+                SerialPort1.Open()
+                Console.WriteLine("COM port opened successfully.")
+            Catch ex As Exception
+                ' Handle the case where the port cannot be opened (e.g., in use, wrong port name)
+                Console.WriteLine($"Error opening COM port: {ex.Message}")
+            End Try
+        Else
+            Console.WriteLine("COM port is already open.")
+        End If
     End Sub
 
-
+    ' The form's Load event is the best place to call Connect initially.
+    Private Sub SerialPortForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Connect()
+    End Sub
 
     Sub Write()
-        Dim data(0) As Byte 'put bytes into array
-        data(0) = &B11110000 'actual data as a byte
-        SerialPort1.Write(data, 0, 1) 'send bytes as array, start at index 0, send 1 byte
+        If SerialPort1.IsOpen Then
+            Dim data(0) As Byte 'put bytes into array
+            data(0) = &B0 'actual data as a byte
+            SerialPort1.Write(data, 0, 1) 'send bytes as array, start at index 0, send 1 byte
+        Else
+            Console.WriteLine("Error: Cannot Write. COM port is closed.")
+        End If
     End Sub
 
     Sub Output_High()
-        Dim data(1) As Byte 'put bytes into array
-        data(0) = &H20
-        data(1) = &HFF
-        SerialPort1.Write(data, 0, 2)
+        If SerialPort1.IsOpen Then
+            Dim data(1) As Byte 'put bytes into array
+            data(0) = &H24
+            data(1) = &HFF
+            SerialPort1.Write(data, 0, 2)
+        Else
+            Console.WriteLine("Error: Cannot Output_High. COM port is closed.")
+        End If
     End Sub
 
     Sub Output_Low()
-        Dim data(1) As Byte
-        data(0) = &H20
-        data(1) = &H0
-        SerialPort1.Write(data, 0, 2)
+        If SerialPort1.IsOpen Then
+            Dim data(1) As Byte
+            data(0) = &H24
+            data(1) = &H0
+            SerialPort1.Write(data, 0, 2)
+        Else
+            Console.WriteLine("Error: Cannot Output_Low. COM port is closed.")
+        End If
     End Sub
 
     Sub Read()
-        Dim data(SerialPort1.BytesToRead) As Byte
+        ' Reading only happens if data is available (triggered by DataReceived event)
+        Try
+            Dim bytesToRead As Integer = SerialPort1.BytesToRead
+            If bytesToRead > 0 Then
+                Dim data(bytesToRead - 1) As Byte ' Array size is bytesToRead - 1 (0-based)
+                SerialPort1.Read(data, 0, bytesToRead)
 
-        SerialPort1.Read(data, 0, SerialPort1.BytesToRead)
+                For i = 0 To UBound(data)
+                    Console.WriteLine($"Byte {i}: {Chr(data(i))}")
+                Next
 
-        For i = 0 To UBound(data)
-            Console.WriteLine($"Byte {i}: {Chr(data(i))}")
-        Next
-
-        ' Console.WriteLine($"Is this Q@ Board: {IsQuietBoard(data)}")
-        Console.WriteLine(UBound(data))
-
+                Console.WriteLine($"Bytes read: {bytesToRead}")
+            End If
+        Catch ex As Exception
+            Console.WriteLine($"Error during Read operation: {ex.Message}")
+        End Try
     End Sub
 
-    'Function IsQuietBoard(data() As Byte) As Boolean
-
-
-    '    If UBound(data) = 64 And Chr(data(60)) = "@" Then
-    '        Return True
-    '    Else
-    '        Return False
-    '    End If
-
-
-    'End Function
-
     Function CheckIfQuietBoard() As Boolean
-        Dim bytes(0) As Byte
-        bytes(0) = &B11110000
-        SerialPort1.Write(bytes, 0, 1)
-        Return True
+        If SerialPort1.IsOpen Then
+            Dim bytes(0) As Byte
+            bytes(0) = &B11110000
+            SerialPort1.Write(bytes, 0, 1)
+            Return True
+        Else
+            Console.WriteLine("Error: Cannot CheckIfQuietBoard. COM port is closed.")
+            Return False
+        End If
     End Function
 
+    ' --- Event Handlers ---
+
+    ' Now only writes, relying on Connect() being called once at form load
     Private Sub SerialPortForm_Click(sender As Object, e As EventArgs) Handles Me.Click
-        Connect()
         Write()
     End Sub
 
     Private Sub SerialPort1_DataReceived(sender As Object, e As SerialDataReceivedEventArgs) Handles SerialPort1.DataReceived
         Try
-            Console.WriteLine(SerialPort1.BytesToRead)
+            Console.WriteLine($"Data received. Bytes available: {SerialPort1.BytesToRead}")
         Catch ex As Exception
-            Console.WriteLine("oops!")
+            Console.WriteLine("oops! Error accessing BytesToRead.")
         End Try
 
-        Read()
-
+        Read() ' Read the available data
     End Sub
 
+    ' Calls Output_High, no need to call Connect() or Open() again
     Private Sub HighOutputButton_Click(sender As Object, e As EventArgs) Handles HighOutputButton.Click
-        Connect()
         Output_High()
-        'SerialPort1.Open()
-
     End Sub
 
+    ' Calls Output_Low, no need to call Connect() again
     Private Sub LowOutputButton_Click(sender As Object, e As EventArgs) Handles LowOutputButton.Click
-        Connect()
         Output_Low()
     End Sub
 
+    ' The Timer_Tick event is critical. It must NOT call Connect() repeatedly.
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
-        ' Dim CurrentCount As Integer
-        Connect()
-        'CheckIfQuietBoard()
+        If Not SerialPort1.IsOpen Then
+            Console.WriteLine("Timer tick skipped: COM port is closed.")
+            Return ' Exit if the port isn't open
+        End If
 
         CurrentCount += 1
 
         Dim byteToSend(1) As Byte
 
-
         Select Case CurrentCount
-            Case 1
-                'Output_High()
-                byteToSend(0) = &H20
-                byteToSend(1) = &H1
-                SerialPort1.Write(byteToSend, 0, 2)
-            Case 2
-                ' Output_Low()
-                byteToSend(0) = &H20
-                byteToSend(1) = &H2
-                SerialPort1.Write(byteToSend, 0, 2)
-            Case 3
-                ' Output_High()
-                byteToSend(0) = &H20
-                byteToSend(1) = &H4
-                SerialPort1.Write(byteToSend, 0, 2)
-            Case 4
-                ' Output_Low()
-                byteToSend(0) = &H20
-                byteToSend(1) = &H8
-                SerialPort1.Write(byteToSend, 0, 2)
-            Case 5
-                'Output_High()
-                byteToSend(0) = &H20
-                byteToSend(1) = &H10
-                SerialPort1.Write(byteToSend, 0, 2)
-            Case 6
-                ' Output_Low()
-                byteToSend(0) = &H20
-                byteToSend(1) = &H20
-                SerialPort1.Write(byteToSend, 0, 2)
-            Case 7
-                ' Output_High()
-                byteToSend(0) = &H20
-                byteToSend(1) = &H40
-                SerialPort1.Write(byteToSend, 0, 2)
-            Case 8
-                ' Output_High()
-                byteToSend(0) = &H20
-                byteToSend(1) = &H80
-                SerialPort1.Write(byteToSend, 0, 2)
-            Case Else
-                'Return ' Exit if CurrentCount is not 0 or 1
+            Case 1 : byteToSend(0) = &H24 : byteToSend(1) = &H1F
+            Case 2 : byteToSend(0) = &H24 : byteToSend(1) = &H20
+            Case 3 : byteToSend(0) = &H24 : byteToSend(1) = &H4F
+            Case 4 : byteToSend(0) = &H24 : byteToSend(1) = &H80
+            Case 5 : byteToSend(0) = &H24 : byteToSend(1) = &H1F
+            Case 6 : byteToSend(0) = &H24 : byteToSend(1) = &H20
+            Case 7 : byteToSend(0) = &H24 : byteToSend(1) = &H4F
+            Case 8 : byteToSend(0) = &H24 : byteToSend(1) = &H80
+            Case Else : Return
         End Select
 
-        Dim data(0) As Byte
-        'Dim data(1) As Byte
-        ' data(1) = byteToSend(1)
-        data(0) = byteToSend(0)
-        SerialPort1.Write(data, 0, 1)
+        ' Write the 2-byte command
+        SerialPort1.Write(byteToSend, 0, 2)
+
+        ' Your original code had this redundant 1-byte write right after the 2-byte write.
+        ' Assuming the 2-byte write is the intended command, this 1-byte write is removed.
+        ' If you need the 1-byte write, you can uncomment and adjust it:
+        ' Dim data(0) As Byte
+        ' data(0) = byteToSend(0)
+        ' SerialPort1.Write(data, 0, 1) 
 
         If CurrentCount >= 8 Then
             CurrentCount = 0
         End If
     End Sub
 
+    ' RingCounter and RingCounterButton methods remain as placeholders
     Sub RingCounter()
-
     End Sub
 
     Private Sub RingCounterButton_Click(sender As Object, e As EventArgs) Handles RingCounterButton.Click
         'RingCounter()
-
     End Sub
+
+    ' Ensure the port is closed when the form closes
+    Private Sub SerialPortForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If SerialPort1.IsOpen Then
+            SerialPort1.Close()
+        End If
+    End Sub
+
 End Class

@@ -67,6 +67,7 @@ Partial Class SerialPortForm
         'Timer
         '
         Me.Timer.Enabled = True
+        Me.Timer.Interval = 500
         '
         'StatusStrip1
         '
