@@ -1,4 +1,5 @@
 ﻿Imports System.IO.Ports
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
 Public Class SerialPortForm
     ' --- NEW: Ring Counter State & Timer ---
@@ -67,8 +68,17 @@ Public Class SerialPortForm
         ' Write the 2-byte command
         SerialPort1.Write(byteToSend, 0, 2)
         Console.WriteLine($"Sent command for Case {caseIndex} (Value: &H{byteToSend(1).ToString("X2")})")
+        UpdateLogBox($"Sent command for Case {caseIndex} (Value: &H{byteToSend(1).ToString("X2")})")
     End Sub
-
+    Private Sub UpdateLogBox(ByVal text As String)
+        ' This ensures the update happens safely on the UI thread
+        If Me.TransmissionToPicTextBox.InvokeRequired Then
+            Me.Invoke(Sub() UpdateLogBox(text))
+        Else
+            Me.TransmissionToPicTextBox.AppendText(text & Environment.NewLine)
+            Me.TransmissionToPicTextBox.ScrollToCaret()
+        End If
+    End Sub
     Sub Write()
         If SerialPort1.IsOpen Then
             Dim data(0) As Byte 'put bytes into array
@@ -156,14 +166,47 @@ Public Class SerialPortForm
     End Sub
 
     Private Sub SerialPort1_DataReceived(sender As Object, e As SerialDataReceivedEventArgs) Handles SerialPort1.DataReceived
+        ' 1. Read ALL available bytes into the buffer.
+        '    BytesToRead is volatile, but this operation will empty the buffer
+        '    of whatever was there when it executes.
+        Dim bytesToRead As Integer = SerialPort1.BytesToRead
+        Dim buffer(bytesToRead - 1) As Byte
+
+        ' This single Read() command extracts all the data
+        SerialPort1.Read(buffer, 0, bytesToRead)
+
+        ' 2. Convert and update the UI using Me.Invoke (essential for thread safety)
+        Dim hexData As String = ConvertBytesToHexString(buffer)
+
+        Me.Invoke(Sub()
+                      UpdateTextBox(hexData)
+                  End Sub)
+
         Try
-            Console.WriteLine($"Data received. Bytes available: {SerialPort1.BytesToRead}")
+            Console.WriteLine($"Data received. Bytes read: {bytesToRead}. Remaining: {SerialPort1.BytesToRead}")
         Catch ex As Exception
             Console.WriteLine("oops! Error accessing BytesToRead.")
         End Try
-
-        Read() ' Read the available data
     End Sub
+
+    Private Function ConvertBytesToHexString(ByVal data As Byte()) As String
+        Dim sb As New System.Text.StringBuilder()
+        For Each b As Byte In data
+
+            sb.Append(b.ToString("X2") & " ")
+        Next
+
+        Return sb.ToString().TrimEnd()
+
+    End Function
+
+    Private Sub UpdateTextBox(ByVal text As String)
+        VBRecieveTextBox.AppendText(text & Environment.NewLine)
+        VBRecieveTextBox.ScrollToCaret()
+
+    End Sub
+
+
 
     Private Sub HighOutputButton_Click(sender As Object, e As EventArgs) Handles HighOutputButton.Click
         Output_High()
@@ -194,4 +237,7 @@ Public Class SerialPortForm
             SerialPort1.Close()
         End If
     End Sub
+
+
+
 End Class

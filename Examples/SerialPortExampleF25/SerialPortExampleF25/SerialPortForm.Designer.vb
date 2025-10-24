@@ -34,6 +34,11 @@ Partial Class SerialPortForm
         Me.LowOutputButton = New System.Windows.Forms.Button()
         Me.RingCounterButton = New System.Windows.Forms.Button()
         Me.TrackBar1 = New System.Windows.Forms.TrackBar()
+        Me.VBRecieveTextBox = New System.Windows.Forms.TextBox()
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.RecievedDataLabel = New System.Windows.Forms.Label()
+        Me.TransmissionToPicTextBox = New System.Windows.Forms.TextBox()
+        Me.TransmittedtoPicLabel = New System.Windows.Forms.Label()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -92,7 +97,7 @@ Partial Class SerialPortForm
         '
         'LowOutputButton
         '
-        Me.LowOutputButton.Location = New System.Drawing.Point(333, 47)
+        Me.LowOutputButton.Location = New System.Drawing.Point(178, 237)
         Me.LowOutputButton.Name = "LowOutputButton"
         Me.LowOutputButton.Size = New System.Drawing.Size(81, 73)
         Me.LowOutputButton.TabIndex = 4
@@ -120,11 +125,55 @@ Partial Class SerialPortForm
         Me.TrackBar1.TabIndex = 6
         Me.TrackBar1.Value = 1
         '
+        'VBRecieveTextBox
+        '
+        Me.VBRecieveTextBox.Location = New System.Drawing.Point(465, 70)
+        Me.VBRecieveTextBox.Multiline = True
+        Me.VBRecieveTextBox.Name = "VBRecieveTextBox"
+        Me.VBRecieveTextBox.Size = New System.Drawing.Size(156, 271)
+        Me.VBRecieveTextBox.TabIndex = 7
+        '
+        'ContextMenuStrip1
+        '
+        Me.ContextMenuStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(61, 4)
+        '
+        'RecievedDataLabel
+        '
+        Me.RecievedDataLabel.AutoSize = True
+        Me.RecievedDataLabel.Location = New System.Drawing.Point(470, 47)
+        Me.RecievedDataLabel.Name = "RecievedDataLabel"
+        Me.RecievedDataLabel.Size = New System.Drawing.Size(144, 20)
+        Me.RecievedDataLabel.TabIndex = 9
+        Me.RecievedDataLabel.Text = "Recieved PIC Data"
+        '
+        'TransmissionToPicTextBox
+        '
+        Me.TransmissionToPicTextBox.Location = New System.Drawing.Point(275, 70)
+        Me.TransmissionToPicTextBox.Multiline = True
+        Me.TransmissionToPicTextBox.Name = "TransmissionToPicTextBox"
+        Me.TransmissionToPicTextBox.Size = New System.Drawing.Size(156, 271)
+        Me.TransmissionToPicTextBox.TabIndex = 10
+        '
+        'TransmittedtoPicLabel
+        '
+        Me.TransmittedtoPicLabel.AutoSize = True
+        Me.TransmittedtoPicLabel.Location = New System.Drawing.Point(271, 47)
+        Me.TransmittedtoPicLabel.Name = "TransmittedtoPicLabel"
+        Me.TransmittedtoPicLabel.Size = New System.Drawing.Size(180, 20)
+        Me.TransmittedtoPicLabel.TabIndex = 11
+        Me.TransmittedtoPicLabel.Text = "Data Transmitted to PIC"
+        '
         'SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(655, 375)
+        Me.Controls.Add(Me.TransmittedtoPicLabel)
+        Me.Controls.Add(Me.TransmissionToPicTextBox)
+        Me.Controls.Add(Me.RecievedDataLabel)
+        Me.Controls.Add(Me.VBRecieveTextBox)
         Me.Controls.Add(Me.TrackBar1)
         Me.Controls.Add(Me.RingCounterButton)
         Me.Controls.Add(Me.LowOutputButton)
@@ -153,4 +202,9 @@ Partial Class SerialPortForm
     Friend WithEvents LowOutputButton As Button
     Friend WithEvents RingCounterButton As Button
     Friend WithEvents TrackBar1 As TrackBar
+    Friend WithEvents VBRecieveTextBox As TextBox
+    Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
+    Friend WithEvents RecievedDataLabel As Label
+    Friend WithEvents TransmissionToPicTextBox As TextBox
+    Friend WithEvents TransmittedtoPicLabel As Label
 End Class

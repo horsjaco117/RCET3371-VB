@@ -61,17 +61,22 @@ Public Class SerialCommunicationsNotes
         End Sub
 
         Private Sub SerialPort1_DataReceived(sender As Object, e As SerialDataReceivedEventArgs) Handles SerialPort1.DataReceived
-
             Try
 
                 '   Me.Text = CStr(SerialPort1.BytesToRead)
 
                 Me.Text = CStr(SerialPort1.BytesToRead)
                 Console.WriteLine(SerialPort1.BytesToRead)
+
             Catch ex As Exception
                 Console.WriteLine("oops!")
             End Try
 
             Read()
         End Sub
+
+        Private Sub UpdateTextBox(ByVal text As String)
+
+        End Sub
+
     End Class
