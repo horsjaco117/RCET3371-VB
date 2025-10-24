@@ -64,7 +64,7 @@ Partial Class SerialPortForm
         '
         'HighOutputButton
         '
-        Me.HighOutputButton.Location = New System.Drawing.Point(167, 47)
+        Me.HighOutputButton.Location = New System.Drawing.Point(173, 121)
         Me.HighOutputButton.Name = "HighOutputButton"
         Me.HighOutputButton.Size = New System.Drawing.Size(75, 73)
         Me.HighOutputButton.TabIndex = 2
@@ -80,9 +80,9 @@ Partial Class SerialPortForm
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripDropDownButton1})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 344)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 438)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(655, 31)
+        Me.StatusStrip1.Size = New System.Drawing.Size(732, 31)
         Me.StatusStrip1.TabIndex = 3
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -97,7 +97,7 @@ Partial Class SerialPortForm
         '
         'LowOutputButton
         '
-        Me.LowOutputButton.Location = New System.Drawing.Point(178, 237)
+        Me.LowOutputButton.Location = New System.Drawing.Point(167, 343)
         Me.LowOutputButton.Name = "LowOutputButton"
         Me.LowOutputButton.Size = New System.Drawing.Size(81, 73)
         Me.LowOutputButton.TabIndex = 4
@@ -106,7 +106,7 @@ Partial Class SerialPortForm
         '
         'RingCounterButton
         '
-        Me.RingCounterButton.Location = New System.Drawing.Point(178, 154)
+        Me.RingCounterButton.Location = New System.Drawing.Point(173, 229)
         Me.RingCounterButton.Name = "RingCounterButton"
         Me.RingCounterButton.Size = New System.Drawing.Size(75, 68)
         Me.RingCounterButton.TabIndex = 5
@@ -117,11 +117,11 @@ Partial Class SerialPortForm
         '
         Me.TrackBar1.LargeChange = 1
         Me.TrackBar1.Location = New System.Drawing.Point(26, 121)
-        Me.TrackBar1.Maximum = 8
+        Me.TrackBar1.Maximum = 32
         Me.TrackBar1.Minimum = 1
         Me.TrackBar1.Name = "TrackBar1"
         Me.TrackBar1.Orientation = System.Windows.Forms.Orientation.Vertical
-        Me.TrackBar1.Size = New System.Drawing.Size(69, 137)
+        Me.TrackBar1.Size = New System.Drawing.Size(69, 295)
         Me.TrackBar1.TabIndex = 6
         Me.TrackBar1.Value = 1
         '
@@ -130,7 +130,7 @@ Partial Class SerialPortForm
         Me.VBRecieveTextBox.Location = New System.Drawing.Point(465, 70)
         Me.VBRecieveTextBox.Multiline = True
         Me.VBRecieveTextBox.Name = "VBRecieveTextBox"
-        Me.VBRecieveTextBox.Size = New System.Drawing.Size(156, 271)
+        Me.VBRecieveTextBox.Size = New System.Drawing.Size(221, 365)
         Me.VBRecieveTextBox.TabIndex = 7
         '
         'ContextMenuStrip1
@@ -150,10 +150,10 @@ Partial Class SerialPortForm
         '
         'TransmissionToPicTextBox
         '
-        Me.TransmissionToPicTextBox.Location = New System.Drawing.Point(275, 70)
+        Me.TransmissionToPicTextBox.Location = New System.Drawing.Point(285, 61)
         Me.TransmissionToPicTextBox.Multiline = True
         Me.TransmissionToPicTextBox.Name = "TransmissionToPicTextBox"
-        Me.TransmissionToPicTextBox.Size = New System.Drawing.Size(156, 271)
+        Me.TransmissionToPicTextBox.Size = New System.Drawing.Size(156, 365)
         Me.TransmissionToPicTextBox.TabIndex = 10
         '
         'TransmittedtoPicLabel
@@ -169,7 +169,7 @@ Partial Class SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(655, 375)
+        Me.ClientSize = New System.Drawing.Size(732, 469)
         Me.Controls.Add(Me.TransmittedtoPicLabel)
         Me.Controls.Add(Me.TransmissionToPicTextBox)
         Me.Controls.Add(Me.RecievedDataLabel)
