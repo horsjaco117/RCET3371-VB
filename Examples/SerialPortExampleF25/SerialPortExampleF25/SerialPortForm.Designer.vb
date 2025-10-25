@@ -39,6 +39,7 @@ Partial Class SerialPortForm
         Me.RecievedDataLabel = New System.Windows.Forms.Label()
         Me.TransmissionToPicTextBox = New System.Windows.Forms.TextBox()
         Me.TransmittedtoPicLabel = New System.Windows.Forms.Label()
+        Me.SendDataButton = New System.Windows.Forms.Button()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -64,7 +65,7 @@ Partial Class SerialPortForm
         '
         'HighOutputButton
         '
-        Me.HighOutputButton.Location = New System.Drawing.Point(173, 121)
+        Me.HighOutputButton.Location = New System.Drawing.Point(173, 152)
         Me.HighOutputButton.Name = "HighOutputButton"
         Me.HighOutputButton.Size = New System.Drawing.Size(75, 73)
         Me.HighOutputButton.TabIndex = 2
@@ -97,7 +98,7 @@ Partial Class SerialPortForm
         '
         'LowOutputButton
         '
-        Me.LowOutputButton.Location = New System.Drawing.Point(167, 343)
+        Me.LowOutputButton.Location = New System.Drawing.Point(167, 362)
         Me.LowOutputButton.Name = "LowOutputButton"
         Me.LowOutputButton.Size = New System.Drawing.Size(81, 73)
         Me.LowOutputButton.TabIndex = 4
@@ -106,7 +107,7 @@ Partial Class SerialPortForm
         '
         'RingCounterButton
         '
-        Me.RingCounterButton.Location = New System.Drawing.Point(173, 229)
+        Me.RingCounterButton.Location = New System.Drawing.Point(167, 270)
         Me.RingCounterButton.Name = "RingCounterButton"
         Me.RingCounterButton.Size = New System.Drawing.Size(75, 68)
         Me.RingCounterButton.TabIndex = 5
@@ -165,11 +166,21 @@ Partial Class SerialPortForm
         Me.TransmittedtoPicLabel.TabIndex = 11
         Me.TransmittedtoPicLabel.Text = "Data Transmitted to PIC"
         '
+        'SendDataButton
+        '
+        Me.SendDataButton.Location = New System.Drawing.Point(134, 61)
+        Me.SendDataButton.Name = "SendDataButton"
+        Me.SendDataButton.Size = New System.Drawing.Size(108, 53)
+        Me.SendDataButton.TabIndex = 12
+        Me.SendDataButton.Text = "Send text Data"
+        Me.SendDataButton.UseVisualStyleBackColor = True
+        '
         'SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(732, 469)
+        Me.Controls.Add(Me.SendDataButton)
         Me.Controls.Add(Me.TransmittedtoPicLabel)
         Me.Controls.Add(Me.TransmissionToPicTextBox)
         Me.Controls.Add(Me.RecievedDataLabel)
@@ -207,4 +218,5 @@ Partial Class SerialPortForm
     Friend WithEvents RecievedDataLabel As Label
     Friend WithEvents TransmissionToPicTextBox As TextBox
     Friend WithEvents TransmittedtoPicLabel As Label
+    Friend WithEvents SendDataButton As Button
 End Class

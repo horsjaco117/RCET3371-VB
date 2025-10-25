@@ -260,7 +260,71 @@ Public Class SerialPortForm
 
     End Sub
 
+    Private Sub SendDataButton_Click(sender As Object, e As EventArgs) Handles SendDataButton.Click
+        If Not SerialPort1.IsOpen Then
+            Console.WriteLine("Error: Cannot Send Data. COM port is closed.")
+            UpdateLogBox("ERROR: COM port is closed. Cannot send data.")
+            Return
+        End If
 
+        ' **ASSUMPTION:** The text box is named 'DataToSendTextBox'
+        Dim hexInput As String = InputTextBox.Text
+
+        If String.IsNullOrWhiteSpace(hexInput) Then
+            Console.WriteLine("Cannot send: Text box is empty.")
+            Return
+        End If
+
+        Try
+            ' 1. Convert the Hex string (e.g., "24 F8") into a Byte array
+            Dim dataToSend As Byte() = ConvertHexStringToByteArray(hexInput)
+
+            ' 2. Write the byte array to the serial port
+            SerialPort1.Write(dataToSend, 0, dataToSend.Length)
+
+            ' 3. Log the action
+            Console.WriteLine($"Sent {dataToSend.Length} bytes: {hexInput.Trim()}")
+            UpdateLogBox($"Sent Bytes: {hexInput.Trim()}")
+
+        Catch ex As FormatException
+            ' Handle error from the conversion function
+            Console.WriteLine($"Error in hex format: {ex.Message}")
+            UpdateLogBox($"ERROR: Invalid Hex Format. {ex.Message}")
+        Catch ex As Exception
+            ' Handle general serial port error
+            Console.WriteLine($"Error sending data: {ex.Message}")
+            UpdateLogBox($"ERROR: Serial Write Failed. {ex.Message}")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Converts a space-separated string of hex values (e.g., "24 F8 0A") into a Byte array.
+    ''' </summary>
+    Private Function ConvertHexStringToByteArray(ByVal hexString As String) As Byte()
+        ' Remove leading/trailing spaces and split the string by spaces
+        Dim hexValues As String() = hexString.Trim().Split(" "c)
+
+        ' Determine the size of the output array
+        Dim byteCount As Integer = hexValues.Length
+        If byteCount = 0 Then Return New Byte() {} ' Return empty array if input is empty
+
+        Dim bytes As Byte() = New Byte(byteCount - 1) {}
+
+        For i As Integer = 0 To byteCount - 1
+            Try
+                ' Remove any non-hex characters (like commas, if present)
+                Dim hex As String = hexValues(i).Trim().Replace(",", "")
+
+                ' Convert the 1 or 2 character hex string to a Byte
+                bytes(i) = Convert.ToByte(hex, 16) ' Base 16 (Hexadecimal)
+            Catch ex As Exception
+                ' Handle conversion error (e.g., "G2" is not valid hex)
+                Throw New FormatException($"Invalid hexadecimal value found: '{hexValues(i)}'", ex)
+            End Try
+        Next
+
+        Return bytes
+    End Function
 
     Private Sub HighOutputButton_Click(sender As Object, e As EventArgs) Handles HighOutputButton.Click
         Output_High()
@@ -291,7 +355,6 @@ Public Class SerialPortForm
             SerialPort1.Close()
         End If
     End Sub
-
 
 
 End Class
