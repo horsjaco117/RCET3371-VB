@@ -48,72 +48,40 @@ Public Class SerialPortForm
 
         Dim byteToSend(1) As Byte
 
-        ' The caseIndex (from 1 to 8) now determines which command is sent.
+        ' The caseIndex (from 1 to 32) determines which command is sent.
         Select Case caseIndex
-            Case 1  ' Step 0: ~0.50 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H0   ' 0x00 (bits 7:3=00000)
-            Case 2  ' Step 1: ~0.56 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H8   ' 0x08 (bits 7:3=00001)
-            Case 3  ' Step 2: ~0.63 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H10  ' 0x10
-            Case 4  ' Step 3: ~0.69 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H18  ' 0x18
-            Case 5  ' Step 4: ~0.76 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H20  ' 0x20
-            Case 6  ' Step 5: ~0.82 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H28  ' 0x28
-            Case 7  ' Step 6: ~0.88 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H30  ' 0x30
-            Case 8  ' Step 7: ~0.95 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H38  ' 0x38
-            Case 9  ' Step 8: ~1.01 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H40  ' 0x40
-            Case 10 ' Step 9: ~1.08 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H48  ' 0x48
-            Case 11 ' Step 10: ~1.14 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H50  ' 0x50
-            Case 12 ' Step 11: ~1.22 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H58  ' 0x58
-            Case 13 ' Step 12: ~1.28 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H60  ' 0x60
-            Case 14 ' Step 13: ~1.34 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H68  ' 0x68
-            Case 15 ' Step 14: ~1.41 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H70  ' 0x70
-            Case 16 ' Step 15: ~1.47 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H78  ' 0x78
-            Case 17 ' Step 16: ~1.54 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H80  ' 0x80
-            Case 18 ' Step 17: ~1.60 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H88  ' 0x88
-            Case 19 ' Step 18: ~1.66 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H90  ' 0x90
-            Case 20 ' Step 19: ~1.73 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &H98  ' 0x98
-            Case 21 ' Step 20: ~1.79 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HA0  ' 0xA0
-            Case 22 ' Step 21: ~1.86 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HA8  ' 0xA8
-            Case 23 ' Step 22: ~1.92 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HB0  ' 0xB0
-            Case 24 ' Step 23: ~1.98 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HB8  ' 0xB8
-            Case 25 ' Step 24: ~2.05 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HC0  ' 0xC0
-            Case 26 ' Step 25: ~2.11 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HC8  ' 0xC8
-            Case 27 ' Step 26: ~2.18 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HD0  ' 0xD0
-            Case 28 ' Step 27: ~2.24 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HD8  ' 0xD8
-            Case 29 ' Step 28: ~2.30 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HE0  ' 0xE0
-            Case 30 ' Step 29: ~2.37 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HE8  ' 0xE8
-            Case 31 ' Step 30: ~2.43 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HF0  ' 0xF0
-            Case 32 ' Step 31: ~2.50 ms
-                byteToSend(0) = &H24 : byteToSend(1) = &HF8  ' 0xF8
+            Case 1 : byteToSend(0) = &H24 : byteToSend(1) = &H0
+            Case 2 : byteToSend(0) = &H24 : byteToSend(1) = &H8
+            Case 3 : byteToSend(0) = &H24 : byteToSend(1) = &H10
+            Case 4 : byteToSend(0) = &H24 : byteToSend(1) = &H18
+            Case 5 : byteToSend(0) = &H24 : byteToSend(1) = &H20
+            Case 6 : byteToSend(0) = &H24 : byteToSend(1) = &H28
+            Case 7 : byteToSend(0) = &H24 : byteToSend(1) = &H30
+            Case 8 : byteToSend(0) = &H24 : byteToSend(1) = &H38
+            Case 9 : byteToSend(0) = &H24 : byteToSend(1) = &H40
+            Case 10 : byteToSend(0) = &H24 : byteToSend(1) = &H48
+            Case 11 : byteToSend(0) = &H24 : byteToSend(1) = &H50
+            Case 12 : byteToSend(0) = &H24 : byteToSend(1) = &H58
+            Case 13 : byteToSend(0) = &H24 : byteToSend(1) = &H60
+            Case 14 : byteToSend(0) = &H24 : byteToSend(1) = &H68
+            Case 15 : byteToSend(0) = &H24 : byteToSend(1) = &H70
+            Case 16 : byteToSend(0) = &H24 : byteToSend(1) = &H78
+            Case 17 : byteToSend(0) = &H24 : byteToSend(1) = &H80
+            Case 18 : byteToSend(0) = &H24 : byteToSend(1) = &H88
+            Case 19 : byteToSend(0) = &H24 : byteToSend(1) = &H90
+            Case 20 : byteToSend(0) = &H24 : byteToSend(1) = &H98
+            Case 21 : byteToSend(0) = &H24 : byteToSend(1) = &HA0
+            Case 22 : byteToSend(0) = &H24 : byteToSend(1) = &HA8
+            Case 23 : byteToSend(0) = &H24 : byteToSend(1) = &HB0
+            Case 24 : byteToSend(0) = &H24 : byteToSend(1) = &HB8
+            Case 25 : byteToSend(0) = &H24 : byteToSend(1) = &HC0
+            Case 26 : byteToSend(0) = &H24 : byteToSend(1) = &HC8
+            Case 27 : byteToSend(0) = &H24 : byteToSend(1) = &HD0
+            Case 28 : byteToSend(0) = &H24 : byteToSend(1) = &HD8
+            Case 29 : byteToSend(0) = &H24 : byteToSend(1) = &HE0
+            Case 30 : byteToSend(0) = &H24 : byteToSend(1) = &HE8
+            Case 31 : byteToSend(0) = &H24 : byteToSend(1) = &HF0
+            Case 32 : byteToSend(0) = &H24 : byteToSend(1) = &HF8
             Case Else
                 Console.WriteLine($"Invalid index: {caseIndex}")
                 Return
@@ -154,7 +122,7 @@ Public Class SerialPortForm
     End Sub
 
     Sub Read()
-        ' Reading only happens if data is available (triggered by DataReceived event)
+        ' This function is redundant, as data reception is handled by SerialPort1_DataReceived event
         Try
             Dim bytesToRead As Integer = SerialPort1.BytesToRead
             If bytesToRead > 0 Then
@@ -201,8 +169,8 @@ Public Class SerialPortForm
 
     ' Event handler that fires every time the RingTimer interval elapses
     Private Sub RingTimer_Tick(sender As Object, e As EventArgs) Handles RingTimer.Tick
-        ' The ring counter cycles through Cases 1 through 6
-        If RingCounterStep > 8 Then
+        ' The ring counter cycles through Cases 1 through 32
+        If RingCounterStep > 32 Then
             RingCounterStep = 1 ' Wrap back to the first step
         End If
 
@@ -219,47 +187,100 @@ Public Class SerialPortForm
         Write()
     End Sub
 
+    ' ----------------------------------------------------------------------------------
+    ' | MODIFIED: Data Received Handler with Filtering for &H21 frame                    |
+    ' ----------------------------------------------------------------------------------
     Private Sub SerialPort1_DataReceived(sender As Object, e As SerialDataReceivedEventArgs) Handles SerialPort1.DataReceived
         ' 1. Read ALL available bytes into the buffer.
-        '    BytesToRead is volatile, but this operation will empty the buffer
-        '    of whatever was there when it executes.
         Dim bytesToRead As Integer = SerialPort1.BytesToRead
-        Dim buffer(bytesToRead - 1) As Byte
+        If bytesToRead = 0 Then Return ' Safety check
 
-        ' This single Read() command extracts all the data
+        Dim buffer(bytesToRead - 1) As Byte
         SerialPort1.Read(buffer, 0, bytesToRead)
 
-        ' 2. Convert and update the UI using Me.Invoke (essential for thread safety)
-        Dim hexData As String = ConvertBytesToHexString(buffer)
+        ' 2. Process the buffer to remove the ADC frame (&H21 followed by 2 data bytes)
+        Dim processedData As New System.Collections.Generic.List(Of Byte)()
 
+        Dim i As Integer = 0
+        Do While i < buffer.Length
+            ' CRITICAL FILTERING LOGIC: Check for start byte and enough bytes remaining
+            If buffer(i) = &H21 AndAlso i + 2 < buffer.Length Then
+                ' Found the 3-byte ADC frame. Skip all 3 bytes.
+                Console.WriteLine($"[FILTERED] ADC frame found and SKIPPED starting with &H21 at index {i}.")
+                i += 3
+            Else
+                ' This is useful data, or a partial frame. Keep it.
+                processedData.Add(buffer(i))
+                i += 1
+            End If
+        Loop
+
+        ' 3. Convert the remaining (processed) data to a Hex string
+        Dim hexData As String = ConvertBytesToHexString(processedData.ToArray())
+
+        ' 4. Update the UI using Me.Invoke (essential for thread safety)
         Me.Invoke(Sub()
-                      UpdateTextBox(hexData)
+                      If hexData.Length > 0 Then
+                          UpdateTextBox(hexData) ' Updates VBRecieveTextBox
+                      End If
                   End Sub)
 
         Try
-            Console.WriteLine($"Data received. Bytes read: {bytesToRead}. Remaining: {SerialPort1.BytesToRead}")
+            Console.WriteLine($"Data received. Raw bytes: {bytesToRead}, Filtered bytes: {processedData.Count}. Remaining: {SerialPort1.BytesToRead}")
         Catch ex As Exception
             Console.WriteLine("oops! Error accessing BytesToRead.")
         End Try
     End Sub
+    ' ----------------------------------------------------------------------------------
 
     Private Function ConvertBytesToHexString(ByVal data As Byte()) As String
         Dim sb As New System.Text.StringBuilder()
         For Each b As Byte In data
-
             sb.Append(b.ToString("X2") & " ")
         Next
-
         Return sb.ToString().TrimEnd()
-
     End Function
 
     Private Sub UpdateTextBox(ByVal text As String)
         VBRecieveTextBox.AppendText(text & Environment.NewLine)
         VBRecieveTextBox.ScrollToCaret()
-
     End Sub
 
+    ' ----------------------------------------------------------------------------------
+    ' | NEW FUNCTION: Convert Hex String to Byte Array                                 |
+    ' ----------------------------------------------------------------------------------
+    Private Function ConvertHexStringToByteArray(ByVal hexString As String) As Byte()
+        ' Remove leading/trailing spaces and split the string by spaces
+        Dim hexValues As String() = hexString.Trim().Split(" "c)
+
+        ' Determine the size of the output array
+        Dim byteCount As Integer = hexValues.Count(Function(s) Not String.IsNullOrWhiteSpace(s))
+        If byteCount = 0 Then Return New Byte() {} ' Return empty array if input is empty
+
+        Dim bytes As Byte() = New Byte(byteCount - 1) {}
+        Dim byteIndex As Integer = 0
+
+        For i As Integer = 0 To hexValues.Length - 1
+            Dim hex As String = hexValues(i).Trim().Replace(",", "")
+            If String.IsNullOrWhiteSpace(hex) Then Continue For ' Skip empty strings from multiple spaces
+
+            Try
+                ' Convert the 1 or 2 character hex string to a Byte
+                bytes(byteIndex) = Convert.ToByte(hex, 16) ' Base 16 (Hexadecimal)
+                byteIndex += 1
+            Catch ex As Exception
+                ' Handle conversion error (e.g., "G2" is not valid hex)
+                Throw New FormatException($"Invalid hexadecimal value found: '{hexValues(i)}'", ex)
+            End Try
+        Next
+
+        Return bytes
+    End Function
+    ' ----------------------------------------------------------------------------------
+
+    ' ----------------------------------------------------------------------------------
+    ' | MODIFIED: Send Button Handler to Send Hex Data                                 |
+    ' ----------------------------------------------------------------------------------
     Private Sub SendDataButton_Click(sender As Object, e As EventArgs) Handles SendDataButton.Click
         If Not SerialPort1.IsOpen Then
             Console.WriteLine("Error: Cannot Send Data. COM port is closed.")
@@ -267,7 +288,7 @@ Public Class SerialPortForm
             Return
         End If
 
-        ' **ASSUMPTION:** The text box is named 'DataToSendTextBox'
+        ' **ASSUMPTION:** The text box for sending data is named 'InputTextBox'
         Dim hexInput As String = InputTextBox.Text
 
         If String.IsNullOrWhiteSpace(hexInput) Then
@@ -296,35 +317,7 @@ Public Class SerialPortForm
             UpdateLogBox($"ERROR: Serial Write Failed. {ex.Message}")
         End Try
     End Sub
-
-    ''' <summary>
-    ''' Converts a space-separated string of hex values (e.g., "24 F8 0A") into a Byte array.
-    ''' </summary>
-    Private Function ConvertHexStringToByteArray(ByVal hexString As String) As Byte()
-        ' Remove leading/trailing spaces and split the string by spaces
-        Dim hexValues As String() = hexString.Trim().Split(" "c)
-
-        ' Determine the size of the output array
-        Dim byteCount As Integer = hexValues.Length
-        If byteCount = 0 Then Return New Byte() {} ' Return empty array if input is empty
-
-        Dim bytes As Byte() = New Byte(byteCount - 1) {}
-
-        For i As Integer = 0 To byteCount - 1
-            Try
-                ' Remove any non-hex characters (like commas, if present)
-                Dim hex As String = hexValues(i).Trim().Replace(",", "")
-
-                ' Convert the 1 or 2 character hex string to a Byte
-                bytes(i) = Convert.ToByte(hex, 16) ' Base 16 (Hexadecimal)
-            Catch ex As Exception
-                ' Handle conversion error (e.g., "G2" is not valid hex)
-                Throw New FormatException($"Invalid hexadecimal value found: '{hexValues(i)}'", ex)
-            End Try
-        Next
-
-        Return bytes
-    End Function
+    ' ----------------------------------------------------------------------------------
 
     Private Sub HighOutputButton_Click(sender As Object, e As EventArgs) Handles HighOutputButton.Click
         Output_High()
@@ -355,6 +348,5 @@ Public Class SerialPortForm
             SerialPort1.Close()
         End If
     End Sub
-
 
 End Class
