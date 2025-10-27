@@ -1,13 +1,13 @@
 ﻿Imports System.IO.Ports
-Imports System.Windows.Forms.VisualStyles.VisualStyleElement
+Imports System.Windows.Forms
+
 
 Public Class SerialPortForm
     ' --- NEW: Ring Counter State & Timer ---
     Private WithEvents RingTimer As New System.Windows.Forms.Timer()
-    ' Tracks the current index (1-6) for the ring counter sequence
+    ' Tracks the current index (1-32) for the ring counter sequence
     Private RingCounterStep As Integer = 1
     ' ---------------------------------------
-
     ' This method now checks if the port is open before attempting to configure and open it.
     Sub Connect()
         If Not SerialPort1.IsOpen Then
@@ -17,7 +17,6 @@ Public Class SerialPortForm
             SerialPort1.StopBits = StopBits.One
             SerialPort1.DataBits = 8
             SerialPort1.PortName = "COM5"
-
             Try
                 SerialPort1.Open()
                 Console.WriteLine("COM port opened successfully.")
@@ -35,19 +34,16 @@ Public Class SerialPortForm
         ' Initialize the Ring Counter Timer
         RingTimer.Interval = 100 ' Set rotation speed to 250ms (4 steps per second)
         RingTimer.Enabled = False ' Start disabled
-
         Connect()
     End Sub
 
-    ' New: Centralized function to handle the serial write logic based on an index (1-8).
+    ' New: Centralized function to handle the serial write logic based on an index (1-32).
     Sub SendCommand(ByVal caseIndex As Integer)
         If Not SerialPort1.IsOpen Then
             Console.WriteLine("Command skipped: COM port is closed.")
             Return
         End If
-
         Dim byteToSend(1) As Byte
-
         ' The caseIndex (from 1 to 32) determines which command is sent.
         Select Case caseIndex
             Case 1 : byteToSend(0) = &H24 : byteToSend(1) = &H0
@@ -86,12 +82,12 @@ Public Class SerialPortForm
                 Console.WriteLine($"Invalid index: {caseIndex}")
                 Return
         End Select
-
         ' Write the 2-byte command
         SerialPort1.Write(byteToSend, 0, 2)
         Console.WriteLine($"Sent command for Case {caseIndex} (Value: &H{byteToSend(1).ToString("X2")})")
         UpdateLogBox($"Sent command for Case {caseIndex} (Value: &H{byteToSend(1).ToString("X2")})")
     End Sub
+
     Private Sub UpdateLogBox(ByVal text As String)
         ' This ensures the update happens safely on the UI thread
         If Me.TransmissionToPicTextBox.InvokeRequired Then
@@ -101,6 +97,7 @@ Public Class SerialPortForm
             Me.TransmissionToPicTextBox.ScrollToCaret()
         End If
     End Sub
+
     Sub Write()
         If SerialPort1.IsOpen Then
             Dim data(0) As Byte 'put bytes into array
@@ -112,12 +109,12 @@ Public Class SerialPortForm
     End Sub
 
     Sub Output_High()
-        ' Now calls SendCommand Case 8 (All High)
+        ' Now calls SendCommand Case 32 (All High)
         SendCommand(32)
     End Sub
 
     Sub Output_Low()
-        ' Now calls SendCommand Case 7 (All Low)
+        ' Now calls SendCommand Case 1 (All Low)
         SendCommand(1)
     End Sub
 
@@ -128,11 +125,9 @@ Public Class SerialPortForm
             If bytesToRead > 0 Then
                 Dim data(bytesToRead - 1) As Byte ' Array size is bytesToRead - 1 (0-based)
                 SerialPort1.Read(data, 0, bytesToRead)
-
                 For i = 0 To UBound(data)
                     Console.WriteLine($"Byte {i}: {Chr(data(i))}")
                 Next
-
                 Console.WriteLine($"Bytes read: {bytesToRead}")
             End If
         Catch ex As Exception
@@ -156,8 +151,8 @@ Public Class SerialPortForm
     Sub RingCounter()
         If RingTimer.Enabled Then
             RingTimer.Stop()
-            ' Stop the rotation and turn all outputs OFF (Case 7)
-            SendCommand(7)
+            ' Stop the rotation and turn all outputs OFF (Case 1)
+            SendCommand(1)
             Console.WriteLine("Ring Counter Stopped.")
         Else
             ' Reset the step to start at the first output (Case 1)
@@ -173,66 +168,87 @@ Public Class SerialPortForm
         If RingCounterStep > 32 Then
             RingCounterStep = 1 ' Wrap back to the first step
         End If
-
         ' Send the command for the current step
         SendCommand(RingCounterStep)
-
         ' Move to the next step
         RingCounterStep += 1
     End Sub
 
     ' --- Event Handlers ---
-
     Private Sub SerialPortForm_Click(sender As Object, e As EventArgs) Handles Me.Click
         Write()
     End Sub
 
     ' ----------------------------------------------------------------------------------
-    ' | MODIFIED: Data Received Handler with Filtering for &H21 frame                    |
+    ' | MODIFIED: Data Received Handler – Separates ADC and Servo Streams |
+    ' ----------------------------------------------------------------------------------
+    ' ----------------------------------------------------------------------------------
+    ' | MODIFIED: Data Received Handler – Separates ADC and Servo Streams |
     ' ----------------------------------------------------------------------------------
     Private Sub SerialPort1_DataReceived(sender As Object, e As SerialDataReceivedEventArgs) Handles SerialPort1.DataReceived
-        ' 1. Read ALL available bytes into the buffer.
         Dim bytesToRead As Integer = SerialPort1.BytesToRead
         If bytesToRead = 0 Then Return ' Safety check
 
         Dim buffer(bytesToRead - 1) As Byte
         SerialPort1.Read(buffer, 0, bytesToRead)
 
-        ' 2. Process the buffer to remove the ADC frame (&H21 followed by 2 data bytes)
-        Dim processedData As New System.Collections.Generic.List(Of Byte)()
+        Dim adcData As New List(Of Byte)()      ' Collects 0x21 XX frames
+        Dim servoData As New List(Of Byte)()    ' Collects 0x24 XX frames
+        ' You can optionally add a "junkData" list here to collect discarded bytes
 
         Dim i As Integer = 0
         Do While i < buffer.Length
-            ' CRITICAL FILTERING LOGIC: Check for start byte and enough bytes remaining
-            If buffer(i) = &H21 AndAlso i + 2 < buffer.Length Then
-                ' Found the 3-byte ADC frame. Skip all 3 bytes.
-                Console.WriteLine($"[FILTERED] ADC frame found and SKIPPED starting with &H21 at index {i}.")
-                i += 3
+            ' Check if there is a second byte available to form a complete frame
+            If i + 1 < buffer.Length Then
+                ' ---- ADC frame: 0x21 followed by 1 data byte ----
+                If buffer(i) = &H21 Then
+                    adcData.Add(buffer(i))      ' 0x21
+                    adcData.Add(buffer(i + 1))  ' ADC value (XX)
+                    i += 2                      ' Consume 2 bytes (frame)
+
+                    ' ---- Servo Frame: 0x24 followed by 1 data byte ----
+                ElseIf buffer(i) = &H24 Then
+                    servoData.Add(buffer(i))    ' 0x24
+                    servoData.Add(buffer(i + 1)) ' Servo value (XX)
+                    i += 2                      ' Consume 2 bytes (frame)
+                Else
+                    ' If the current byte is not 0x21 or 0x24, and it was followed
+                    ' by another byte, treat this byte as an individual data point
+                    ' and advance by 1. This prevents misinterpreting a random byte
+                    ' as a header for the *next* byte.
+                    i += 1 ' Consume 1 byte (discarded from specific lists)
+                End If
             Else
-                ' This is useful data, or a partial frame. Keep it.
-                processedData.Add(buffer(i))
-                i += 1
+                ' Only one byte left in the buffer. Cannot form a 2-byte frame.
+                ' Discard the last byte (or store it for later if you implement buffering).
+                i += 1 ' Consume 1 byte (discarded)
             End If
         Loop
 
-        ' 3. Convert the remaining (processed) data to a Hex string
-        Dim hexData As String = ConvertBytesToHexString(processedData.ToArray())
-
-        ' 4. Update the UI using Me.Invoke (essential for thread safety)
+        ' ---- Update UI (thread-safe) ----
         Me.Invoke(Sub()
-                      If hexData.Length > 0 Then
-                          UpdateTextBox(hexData) ' Updates VBRecieveTextBox
+                      If adcData.Count > 0 Then
+                          Dim adcHex = ConvertBytesToHexString(adcData.ToArray())
+                          ' Only display 0x21 XX frames
+                          UpdateTextBox(VBRecieveTextBox, adcHex)
+                      End If
+
+                      If servoData.Count > 0 Then
+                          Dim srvHex = ConvertBytesToHexString(servoData.ToArray())
+                          ' Only display 0x24 XX frames
+                          UpdateTextBox(VBRecieveServoTextBox, srvHex)
                       End If
                   End Sub)
 
+        ' ... rest of the function remains the same ...
         Try
-            Console.WriteLine($"Data received. Raw bytes: {bytesToRead}, Filtered bytes: {processedData.Count}. Remaining: {SerialPort1.BytesToRead}")
+            Console.WriteLine($"Data received. Raw: {bytesToRead}, ADC: {adcData.Count}, Servo: {servoData.Count}")
         Catch ex As Exception
-            Console.WriteLine("oops! Error accessing BytesToRead.")
+            Console.WriteLine("Error accessing BytesToRead.")
         End Try
     End Sub
-    ' ----------------------------------------------------------------------------------
 
+    ' ----------------------------------------------------------------------------------
     Private Function ConvertBytesToHexString(ByVal data As Byte()) As String
         Dim sb As New System.Text.StringBuilder()
         For Each b As Byte In data
@@ -241,29 +257,28 @@ Public Class SerialPortForm
         Return sb.ToString().TrimEnd()
     End Function
 
-    Private Sub UpdateTextBox(ByVal text As String)
-        VBRecieveTextBox.AppendText(text & Environment.NewLine)
-        VBRecieveTextBox.ScrollToCaret()
+    ' ----------------------------------------------------------------------------------
+    ' | NEW: Generic UpdateTextBox – works with any TextBox |
+    ' ----------------------------------------------------------------------------------
+    Private Sub UpdateTextBox(tb As TextBox, text As String)
+        tb.Text = text & Environment.NewLine
+        tb.ScrollToCaret()
     End Sub
 
     ' ----------------------------------------------------------------------------------
-    ' | NEW FUNCTION: Convert Hex String to Byte Array                                 |
+    ' | NEW FUNCTION: Convert Hex String to Byte Array |
     ' ----------------------------------------------------------------------------------
     Private Function ConvertHexStringToByteArray(ByVal hexString As String) As Byte()
         ' Remove leading/trailing spaces and split the string by spaces
         Dim hexValues As String() = hexString.Trim().Split(" "c)
-
         ' Determine the size of the output array
         Dim byteCount As Integer = hexValues.Count(Function(s) Not String.IsNullOrWhiteSpace(s))
         If byteCount = 0 Then Return New Byte() {} ' Return empty array if input is empty
-
         Dim bytes As Byte() = New Byte(byteCount - 1) {}
         Dim byteIndex As Integer = 0
-
         For i As Integer = 0 To hexValues.Length - 1
             Dim hex As String = hexValues(i).Trim().Replace(",", "")
             If String.IsNullOrWhiteSpace(hex) Then Continue For ' Skip empty strings from multiple spaces
-
             Try
                 ' Convert the 1 or 2 character hex string to a Byte
                 bytes(byteIndex) = Convert.ToByte(hex, 16) ' Base 16 (Hexadecimal)
@@ -273,13 +288,11 @@ Public Class SerialPortForm
                 Throw New FormatException($"Invalid hexadecimal value found: '{hexValues(i)}'", ex)
             End Try
         Next
-
         Return bytes
     End Function
-    ' ----------------------------------------------------------------------------------
 
     ' ----------------------------------------------------------------------------------
-    ' | MODIFIED: Send Button Handler to Send Hex Data                                 |
+    ' | MODIFIED: Send Button Handler to Send Hex Data |
     ' ----------------------------------------------------------------------------------
     Private Sub SendDataButton_Click(sender As Object, e As EventArgs) Handles SendDataButton.Click
         If Not SerialPort1.IsOpen Then
@@ -287,26 +300,20 @@ Public Class SerialPortForm
             UpdateLogBox("ERROR: COM port is closed. Cannot send data.")
             Return
         End If
-
         ' **ASSUMPTION:** The text box for sending data is named 'InputTextBox'
         Dim hexInput As String = InputTextBox.Text
-
         If String.IsNullOrWhiteSpace(hexInput) Then
             Console.WriteLine("Cannot send: Text box is empty.")
             Return
         End If
-
         Try
             ' 1. Convert the Hex string (e.g., "24 F8") into a Byte array
             Dim dataToSend As Byte() = ConvertHexStringToByteArray(hexInput)
-
             ' 2. Write the byte array to the serial port
             SerialPort1.Write(dataToSend, 0, dataToSend.Length)
-
             ' 3. Log the action
             Console.WriteLine($"Sent {dataToSend.Length} bytes: {hexInput.Trim()}")
             UpdateLogBox($"Sent Bytes: {hexInput.Trim()}")
-
         Catch ex As FormatException
             ' Handle error from the conversion function
             Console.WriteLine($"Error in hex format: {ex.Message}")
@@ -317,8 +324,8 @@ Public Class SerialPortForm
             UpdateLogBox($"ERROR: Serial Write Failed. {ex.Message}")
         End Try
     End Sub
-    ' ----------------------------------------------------------------------------------
 
+    ' ----------------------------------------------------------------------------------
     Private Sub HighOutputButton_Click(sender As Object, e As EventArgs) Handles HighOutputButton.Click
         Output_High()
     End Sub
@@ -349,4 +356,14 @@ Public Class SerialPortForm
         End If
     End Sub
 
+    ' ----------------------------------------------------------------------------------
+    ' | OPTIONAL: Clear Buttons (add to form if desired) |
+    ' ----------------------------------------------------------------------------------
+    Private Sub ClearADCButton_Click(sender As Object, e As EventArgs) Handles ClearADCButton.Click
+        VBRecieveTextBox.Clear()
+    End Sub
+
+    Private Sub ClearServoButton_Click(sender As Object, e As EventArgs) Handles ClearServoButton.Click
+        VBRecieveServoTextBox.Clear()
+    End Sub
 End Class

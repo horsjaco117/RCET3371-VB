@@ -40,6 +40,10 @@ Partial Class SerialPortForm
         Me.TransmissionToPicTextBox = New System.Windows.Forms.TextBox()
         Me.TransmittedtoPicLabel = New System.Windows.Forms.Label()
         Me.SendDataButton = New System.Windows.Forms.Button()
+        Me.VBRecieveServoTextBox = New System.Windows.Forms.TextBox()
+        Me.ServoDataLabel = New System.Windows.Forms.Label()
+        Me.ClearADCButton = New System.Windows.Forms.Button()
+        Me.ClearServoButton = New System.Windows.Forms.Button()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -83,7 +87,7 @@ Partial Class SerialPortForm
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripDropDownButton1})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 438)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(732, 31)
+        Me.StatusStrip1.Size = New System.Drawing.Size(1063, 31)
         Me.StatusStrip1.TabIndex = 3
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -145,9 +149,9 @@ Partial Class SerialPortForm
         Me.RecievedDataLabel.AutoSize = True
         Me.RecievedDataLabel.Location = New System.Drawing.Point(470, 47)
         Me.RecievedDataLabel.Name = "RecievedDataLabel"
-        Me.RecievedDataLabel.Size = New System.Drawing.Size(144, 20)
+        Me.RecievedDataLabel.Size = New System.Drawing.Size(168, 30)
         Me.RecievedDataLabel.TabIndex = 9
-        Me.RecievedDataLabel.Text = "Recieved PIC Data"
+        Me.RecievedDataLabel.Text = "ADC PIC Data"
         '
         'TransmissionToPicTextBox
         '
@@ -175,11 +179,50 @@ Partial Class SerialPortForm
         Me.SendDataButton.Text = "Send text Data"
         Me.SendDataButton.UseVisualStyleBackColor = True
         '
+        'VBRecieveServoTextBox
+        '
+        Me.VBRecieveServoTextBox.Location = New System.Drawing.Point(711, 70)
+        Me.VBRecieveServoTextBox.Multiline = True
+        Me.VBRecieveServoTextBox.Name = "VBRecieveServoTextBox"
+        Me.VBRecieveServoTextBox.Size = New System.Drawing.Size(200, 365)
+        Me.VBRecieveServoTextBox.TabIndex = 13
+        '
+        'ServoDataLabel
+        '
+        Me.ServoDataLabel.AutoSize = True
+        Me.ServoDataLabel.Location = New System.Drawing.Point(704, 47)
+        Me.ServoDataLabel.Name = "ServoDataLabel"
+        Me.ServoDataLabel.Size = New System.Drawing.Size(89, 20)
+        Me.ServoDataLabel.TabIndex = 14
+        Me.ServoDataLabel.Text = "Servo Data"
+        '
+        'ClearADCButton
+        '
+        Me.ClearADCButton.Location = New System.Drawing.Point(956, 80)
+        Me.ClearADCButton.Name = "ClearADCButton"
+        Me.ClearADCButton.Size = New System.Drawing.Size(70, 51)
+        Me.ClearADCButton.TabIndex = 15
+        Me.ClearADCButton.Text = "Clear ADC"
+        Me.ClearADCButton.UseVisualStyleBackColor = True
+        '
+        'ClearServoButton
+        '
+        Me.ClearServoButton.Location = New System.Drawing.Point(956, 189)
+        Me.ClearServoButton.Name = "ClearServoButton"
+        Me.ClearServoButton.Size = New System.Drawing.Size(71, 55)
+        Me.ClearServoButton.TabIndex = 16
+        Me.ClearServoButton.Text = "Clear Servo"
+        Me.ClearServoButton.UseVisualStyleBackColor = True
+        '
         'SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(732, 469)
+        Me.ClientSize = New System.Drawing.Size(1063, 469)
+        Me.Controls.Add(Me.ClearServoButton)
+        Me.Controls.Add(Me.ClearADCButton)
+        Me.Controls.Add(Me.ServoDataLabel)
+        Me.Controls.Add(Me.VBRecieveServoTextBox)
         Me.Controls.Add(Me.SendDataButton)
         Me.Controls.Add(Me.TransmittedtoPicLabel)
         Me.Controls.Add(Me.TransmissionToPicTextBox)
@@ -219,4 +262,8 @@ Partial Class SerialPortForm
     Friend WithEvents TransmissionToPicTextBox As TextBox
     Friend WithEvents TransmittedtoPicLabel As Label
     Friend WithEvents SendDataButton As Button
+    Friend WithEvents VBRecieveServoTextBox As TextBox
+    Friend WithEvents ServoDataLabel As Label
+    Friend WithEvents ClearADCButton As Button
+    Friend WithEvents ClearServoButton As Button
 End Class
