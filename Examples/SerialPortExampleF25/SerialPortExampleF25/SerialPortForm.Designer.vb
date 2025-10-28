@@ -134,9 +134,8 @@ Partial Class SerialPortForm
         'VBRecieveTextBox
         '
         Me.VBRecieveTextBox.Location = New System.Drawing.Point(465, 70)
-        Me.VBRecieveTextBox.Multiline = True
         Me.VBRecieveTextBox.Name = "VBRecieveTextBox"
-        Me.VBRecieveTextBox.Size = New System.Drawing.Size(221, 365)
+        Me.VBRecieveTextBox.Size = New System.Drawing.Size(221, 26)
         Me.VBRecieveTextBox.TabIndex = 7
         '
         'ContextMenuStrip1
@@ -183,9 +182,8 @@ Partial Class SerialPortForm
         'VBRecieveServoTextBox
         '
         Me.VBRecieveServoTextBox.Location = New System.Drawing.Point(711, 70)
-        Me.VBRecieveServoTextBox.Multiline = True
         Me.VBRecieveServoTextBox.Name = "VBRecieveServoTextBox"
-        Me.VBRecieveServoTextBox.Size = New System.Drawing.Size(200, 365)
+        Me.VBRecieveServoTextBox.Size = New System.Drawing.Size(200, 26)
         Me.VBRecieveServoTextBox.TabIndex = 13
         '
         'ServoDataLabel

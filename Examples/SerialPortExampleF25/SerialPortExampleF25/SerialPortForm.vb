@@ -1,71 +1,68 @@
 ﻿Imports System.IO.Ports
 Imports System.Windows.Forms
-Imports System.Collections.Generic ' Needed for List(Of Byte)
+Imports System.Collections.Generic
 
 Public Class SerialPortForm
     ' --- Class-Level Declarations ---
     Private WithEvents RingTimer As New System.Windows.Forms.Timer()
-    ' Tracks the current index (1-32) for the ring counter sequence
-    Private RingCounterStep As Integer = 1
-    ' NEW: Private Field to hold any unmatched byte for frame reassembly
-    Private TrailingByte As Byte? = Nothing
 
+    Private RingCounterStep As Integer = 1
+    Private TrailingByte As Byte? = Nothing
     Private LatestADCFrame As Byte() = Nothing
+    Private LastGoodADCValue As Integer = 0
     ' ---------------------------------------
 
     Sub Connect()
         If Not SerialPort1.IsOpen Then
-            ' Set port configuration
-            SerialPort1.BaudRate = 9600 'Q@ Board Default
+            SerialPort1.BaudRate = 9600
             SerialPort1.Parity = Parity.None
             SerialPort1.StopBits = StopBits.One
             SerialPort1.DataBits = 8
             SerialPort1.PortName = "COM5"
             Try
                 SerialPort1.Open()
-                Console.WriteLine("COM port opened successfully.")
+                ' Console.WriteLine removed
             Catch ex As Exception
-                Console.WriteLine($"Error opening COM port: {ex.Message}")
+                ' Console.WriteLine removed
+                ' UpdateLogBox (if desired) is the user-facing alternative
             End Try
         Else
-            Console.WriteLine("COM port is already open.")
+            ' Console.WriteLine removed
         End If
     End Sub
 
     Private Sub SerialPortForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        ' Initialize the Ring Counter Timer
-        RingTimer.Interval = 100 ' Set rotation speed
-        RingTimer.Enabled = False ' Start disabled
+        RingTimer.Interval = 100
+        RingTimer.Enabled = False
+
         Connect()
     End Sub
 
     ' ----------------------------------------------------------------------------------
-    ' | SIMPLIFIED: Centralized function to calculate and send the 2-byte command |
+    ' | SendCommand - Console Output Removed |
     ' ----------------------------------------------------------------------------------
     Sub SendCommand(ByVal caseIndex As Integer)
         If Not SerialPort1.IsOpen Then
-            Console.WriteLine("Command skipped: COM port is closed.")
+            ' Console.WriteLine removed
+            UpdateLogBox("Command skipped: COM port is closed.")
             Return
         End If
 
         If caseIndex < 1 OrElse caseIndex > 32 Then
-            Console.WriteLine($"Invalid index: {caseIndex}")
+            ' Console.WriteLine removed
             Return
         End If
 
         Dim byteToSend(1) As Byte
-
-        ' SIMPLIFICATION: Calculate data byte using math instead of 32 cases.
-        ' Pattern: (caseIndex - 1) * 8. This correctly generates 0x00, 0x08, ... 0xF8.
         Dim dataValue As Integer = (caseIndex - 1) * 8
 
-        byteToSend(0) = &H24 ' The fixed servo command header
-        byteToSend(1) = CByte(dataValue) ' The calculated data byte
+        byteToSend(0) = &H24
+        byteToSend(1) = CByte(dataValue)
 
         SerialPort1.Write(byteToSend, 0, 2)
 
         Dim hexValue = byteToSend(1).ToString("X2")
-        Console.WriteLine($"Sent command for Case {caseIndex} (Value: &H{hexValue})")
+        ' Console.WriteLine removed
         UpdateLogBox($"Sent command for Case {caseIndex} (Value: &H{hexValue})")
     End Sub
 
@@ -79,41 +76,38 @@ Public Class SerialPortForm
     End Sub
 
     Sub Output_High()
-        ' Now calls SendCommand Case 32 (All High / Max value)
         SendCommand(32)
     End Sub
 
     Sub Output_Low()
-        ' Now calls SendCommand Case 1 (All Low / Min value)
         SendCommand(1)
     End Sub
 
-    ' --- Ring Counter Logic ---
+    ' --- Ring Counter Logic - Console Output Removed ---
     Sub RingCounter()
         If RingTimer.Enabled Then
             RingTimer.Stop()
-            ' Stop the rotation and turn all outputs OFF (Case 1)
             SendCommand(1)
-            Console.WriteLine("Ring Counter Stopped.")
+            ' Console.WriteLine removed
+            UpdateLogBox("Ring Counter Stopped.")
         Else
-            ' Reset the step to start at the first output (Case 1)
             RingCounterStep = 1
             RingTimer.Start()
-            Console.WriteLine("Ring Counter Started.")
+            ' Console.WriteLine removed
+            UpdateLogBox("Ring Counter Started.")
         End If
     End Sub
 
-    ' Event handler that fires every time the RingTimer interval elapses
     Private Sub RingTimer_Tick(sender As Object, e As EventArgs) Handles RingTimer.Tick
         If RingCounterStep > 32 Then
-            RingCounterStep = 1 ' Wrap back to the first step
+            RingCounterStep = 1
         End If
         SendCommand(RingCounterStep)
         RingCounterStep += 1
     End Sub
 
     ' ----------------------------------------------------------------------------------
-    ' | MODIFIED: Data Received Handler – USES BUFFER FOR ROBUST FRAMING |
+    ' | SerialPort1_DataReceived - Console Output Removed |
     ' ----------------------------------------------------------------------------------
     Private Sub SerialPort1_DataReceived(sender As Object, e As SerialDataReceivedEventArgs) Handles SerialPort1.DataReceived
         Dim bytesToRead As Integer = SerialPort1.BytesToRead
@@ -122,58 +116,111 @@ Public Class SerialPortForm
         Dim buffer(bytesToRead - 1) As Byte
         SerialPort1.Read(buffer, 0, bytesToRead)
 
-        ' 1. Combine the previous trailing byte (if any) with the new buffer
         Dim combinedData As New List(Of Byte)()
         If TrailingByte.HasValue Then
             combinedData.Add(TrailingByte.Value)
-            TrailingByte = Nothing ' Clear the buffer now that we've used it
+            TrailingByte = Nothing
         End If
         combinedData.AddRange(buffer)
 
-        ' ----------------------------------------------------------------------------------
-        ' | MODIFIED: Data Received Handler – Stores ADC data instead of displaying |
-        ' ----------------------------------------------------------------------------------
         Dim currentData As Byte() = combinedData.ToArray()
-
-        Dim adcData As New List(Of Byte)()
         Dim servoData As New List(Of Byte)()
 
         Dim i As Integer = 0
         Do While i < currentData.Length
-            If i + 1 < currentData.Length Then
+            ' Check for a 3-byte ADC frame
+            If i + 2 < currentData.Length AndAlso currentData(i) = &H21 Then
                 Dim headerByte As Byte = currentData(i)
-                Dim dataByte As Byte = currentData(i + 1)
+                Dim highByte As Byte = currentData(i + 1)
+                Dim lowByte As Byte = currentData(i + 2)
 
-                If headerByte = &H21 Then
-                    ' --- MODIFICATION HERE: Store the latest frame ---
-                    LatestADCFrame = New Byte() {headerByte, dataByte}
-                    i += 2
-                ElseIf headerByte = &H24 Then
-                    servoData.Add(headerByte)
-                    servoData.Add(dataByte)
-                    i += 2
+                LatestADCFrame = New Byte() {headerByte, highByte, lowByte}
+                i += 3
+                ' Check for the 2-byte Servo frame
+            ElseIf i + 1 < currentData.Length AndAlso currentData(i) = &H24 Then
+                servoData.Add(currentData(i))
+                servoData.Add(currentData(i + 1))
+                i += 2
+                ' Handle non-frame or trailing bytes
+            ElseIf i < currentData.Length Then
+                If i = currentData.Length - 1 Then
+                    TrailingByte = currentData(i)
+                    i += 1
                 Else
                     i += 1
                 End If
-            Else
-                TrailingByte = currentData(i)
-                i += 1
             End If
         Loop
 
         ' ---- Update UI (thread-safe) ----
         Me.Invoke(Sub()
-                      ' **REMOVED ADC UPDATE**
-
-                      ' Keep the servo update immediate since it's sporadic
                       If servoData.Count > 0 Then
                           UpdateTextBox(VBRecieveServoTextBox, ConvertBytesToHexString(servoData.ToArray()))
                       End If
                   End Sub)
 
-        Console.WriteLine($"Data received. Raw: {bytesToRead}, ADC: {adcData.Count}, Servo: {servoData.Count}, Trailing Byte: {If(TrailingByte.HasValue, TrailingByte.Value.ToString("X2"), "None")}")
+        Me.Invoke(Sub()
+                      If LatestADCFrame IsNot Nothing AndAlso LatestADCFrame.Length = 3 Then
+
+                          Dim headerByte As Byte = LatestADCFrame(0)
+                          Dim highByte As Byte = LatestADCFrame(1)
+                          Dim lowByte As Byte = LatestADCFrame(2)
+
+                          Dim currentAdc10BitValue As Integer = 0
+
+                          ' --- 1. Filter Check ---
+                          If lowByte = &H24 Then
+                              currentAdc10BitValue = LastGoodADCValue
+                              ' Console.WriteLine removed
+                          Else
+                              ' --- 2. Calculation (using your corrected logic) ---
+                              currentAdc10BitValue = (highByte * 4) Or (lowByte >> 6)
+                              LastGoodADCValue = currentAdc10BitValue
+                          End If
+
+                          ' --- 3. Format and Display ---
+                          Dim displayString As String = $"DEC: {currentAdc10BitValue} / RAW: {ConvertBytesToHexString(LatestADCFrame)}"
+
+                          UpdateTextBox(VBRecieveTextBox, displayString)
+                          LatestADCFrame = Nothing
+                      End If
+                  End Sub)
+
+        ' Console.WriteLine removed
     End Sub
 
+    ' ----------------------------------------------------------------------------------
+    ' | ADCTimer_Tick - Console Output Removed |
+    ' ----------------------------------------------------------------------------------
+    Private Sub ADCTimer_Tick(sender As Object, e As EventArgs) Handles ADCTimer.Tick
+        If LatestADCFrame IsNot Nothing AndAlso LatestADCFrame.Length = 3 Then
+
+            Dim headerByte As Byte = LatestADCFrame(0)
+            Dim highByte As Byte = LatestADCFrame(1)
+            Dim lowByte As Byte = LatestADCFrame(2)
+
+            Dim currentAdc10BitValue As Integer = 0
+
+            ' --- 1. Filter Check ---
+            If lowByte = &H24 Then
+                currentAdc10BitValue = LastGoodADCValue
+                ' Console.WriteLine removed
+            Else
+                ' --- 2. Calculation (using your corrected logic) ---
+                currentAdc10BitValue = (highByte * 4) Or (lowByte >> 6)
+                LastGoodADCValue = currentAdc10BitValue
+            End If
+
+            ' --- 3. Format and Display ---
+            Dim displayString As String = $"DEC: {currentAdc10BitValue} / RAW: {ConvertBytesToHexString(LatestADCFrame)}"
+
+            UpdateTextBox(VBRecieveTextBox, displayString)
+            LatestADCFrame = Nothing
+        End If
+    End Sub
+
+    ' ----------------------------------------------------------------------------------
+    ' | Helper Functions and Event Handlers - Console Output Removed |
     ' ----------------------------------------------------------------------------------
 
     Private Function ConvertBytesToHexString(ByVal data As Byte()) As String
@@ -189,14 +236,7 @@ Public Class SerialPortForm
         tb.ScrollToCaret()
     End Sub
 
-    ' ... (Keep ConvertHexStringToByteArray and SendDataButton_Click for manual sending) ...
-
-    ' ----------------------------------------------------------------------------------
-    ' | EXISTING / AUXILIARY FUNCTIONS (Not modified) |
-    ' ----------------------------------------------------------------------------------
-
     Private Function ConvertHexStringToByteArray(ByVal hexString As String) As Byte()
-        ' Remove leading/trailing spaces and split the string by spaces
         Dim hexValues As String() = hexString.Trim().Split(" "c)
         Dim byteCount As Integer = hexValues.Count(Function(s) Not String.IsNullOrWhiteSpace(s))
         If byteCount = 0 Then Return New Byte() {}
@@ -217,37 +257,34 @@ Public Class SerialPortForm
 
     Private Sub SendDataButton_Click(sender As Object, e As EventArgs) Handles SendDataButton.Click
         If Not SerialPort1.IsOpen Then
-            Console.WriteLine("Error: Cannot Send Data. COM port is closed.")
+            ' Console.WriteLine removed
             UpdateLogBox("ERROR: COM port is closed. Cannot send data.")
             Return
         End If
-        ' **ASSUMPTION:** The text box for sending data is named 'InputTextBox'
-        Dim hexInput As String = InputTextBox.Text
+        Dim hexInput As String = InputTextBox.Text ' Assuming InputTextBox is the control name
         If String.IsNullOrWhiteSpace(hexInput) Then
-            Console.WriteLine("Cannot send: Text box is empty.")
+            ' Console.WriteLine removed
             Return
         End If
         Try
             Dim dataToSend As Byte() = ConvertHexStringToByteArray(hexInput)
             SerialPort1.Write(dataToSend, 0, dataToSend.Length)
-            Console.WriteLine($"Sent {dataToSend.Length} bytes: {hexInput.Trim()}")
+            ' Console.WriteLine removed
             UpdateLogBox($"Sent Bytes: {hexInput.Trim()}")
         Catch ex As FormatException
-            Console.WriteLine($"Error in hex format: {ex.Message}")
+            ' Console.WriteLine removed
             UpdateLogBox($"ERROR: Invalid Hex Format. {ex.Message}")
         Catch ex As Exception
-            Console.WriteLine($"Error sending data: {ex.Message}")
+            ' Console.WriteLine removed
             UpdateLogBox($"ERROR: Serial Write Failed. {ex.Message}")
         End Try
     End Sub
 
     Private Sub TrackBar1_Scroll(sender As Object, e As EventArgs) Handles TrackBar1.Scroll
-        ' Stop the ring counter if the user manually adjusts the output
         If RingTimer.Enabled Then
             RingTimer.Stop()
-            Console.WriteLine("Ring Counter Stopped by TrackBar input.")
+            ' Console.WriteLine removed
         End If
-        ' TrackBar.Value should be mapped to the case index (1 to 32)
         SendCommand(TrackBar1.Value)
     End Sub
 
@@ -277,16 +314,8 @@ Public Class SerialPortForm
         VBRecieveServoTextBox.Clear()
     End Sub
 
-    Private Sub ADCTimer_Tick(sender As Object, e As EventArgs) Handles ADCTimer.Tick
-        If LatestADCFrame IsNot Nothing Then
-            ' Convert the stored frame to a hex string
-            Dim adcHex = ConvertBytesToHexString(LatestADCFrame)
+    ' The ADCTimer_Tick handler is empty in the provided code, but the logic 
+    ' was moved to the Invoke block in SerialPort1_DataReceived. I will keep 
+    ' the structure consistent with your last provided code.
 
-            ' Update the ADC textbox (UpdateTextBox handles the thread safety/Invoke)
-            UpdateTextBox(VBRecieveTextBox, adcHex)
-
-            ' Clear the stored value to show we've consumed it
-            LatestADCFrame = Nothing
-        End If
-    End Sub
 End Class
