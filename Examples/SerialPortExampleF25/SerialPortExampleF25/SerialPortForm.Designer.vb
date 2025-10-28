@@ -44,6 +44,7 @@ Partial Class SerialPortForm
         Me.ServoDataLabel = New System.Windows.Forms.Label()
         Me.ClearADCButton = New System.Windows.Forms.Button()
         Me.ClearServoButton = New System.Windows.Forms.Button()
+        Me.ADCTimer = New System.Windows.Forms.Timer(Me.components)
         Me.StatusStrip1.SuspendLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -149,7 +150,7 @@ Partial Class SerialPortForm
         Me.RecievedDataLabel.AutoSize = True
         Me.RecievedDataLabel.Location = New System.Drawing.Point(470, 47)
         Me.RecievedDataLabel.Name = "RecievedDataLabel"
-        Me.RecievedDataLabel.Size = New System.Drawing.Size(168, 30)
+        Me.RecievedDataLabel.Size = New System.Drawing.Size(112, 20)
         Me.RecievedDataLabel.TabIndex = 9
         Me.RecievedDataLabel.Text = "ADC PIC Data"
         '
@@ -214,6 +215,11 @@ Partial Class SerialPortForm
         Me.ClearServoButton.Text = "Clear Servo"
         Me.ClearServoButton.UseVisualStyleBackColor = True
         '
+        'ADCTimer
+        '
+        Me.ADCTimer.Enabled = True
+        Me.ADCTimer.Interval = 1
+        '
         'SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
@@ -266,4 +272,5 @@ Partial Class SerialPortForm
     Friend WithEvents ServoDataLabel As Label
     Friend WithEvents ClearADCButton As Button
     Friend WithEvents ClearServoButton As Button
+    Friend WithEvents ADCTimer As Timer
 End Class
