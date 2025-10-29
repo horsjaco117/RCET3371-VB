@@ -45,6 +45,12 @@ Partial Class SerialPortForm
         Me.ClearADCButton = New System.Windows.Forms.Button()
         Me.ClearServoButton = New System.Windows.Forms.Button()
         Me.ADCTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.ADCCheckBox = New System.Windows.Forms.CheckBox()
+        Me.ADCContinuousButton = New System.Windows.Forms.Button()
+        Me.ADCOnceButton = New System.Windows.Forms.Button()
+        Me.AllDataTextBox = New System.Windows.Forms.TextBox()
+        Me.VoltageTextBox = New System.Windows.Forms.TextBox()
+        Me.TemperatureTextBox = New System.Windows.Forms.TextBox()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.TrackBar1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -218,11 +224,66 @@ Partial Class SerialPortForm
         Me.ADCTimer.Enabled = True
         Me.ADCTimer.Interval = 1
         '
+        'ADCCheckBox
+        '
+        Me.ADCCheckBox.AutoSize = True
+        Me.ADCCheckBox.Location = New System.Drawing.Point(466, 392)
+        Me.ADCCheckBox.Name = "ADCCheckBox"
+        Me.ADCCheckBox.Size = New System.Drawing.Size(116, 24)
+        Me.ADCCheckBox.TabIndex = 17
+        Me.ADCCheckBox.Text = "CheckBox1"
+        Me.ADCCheckBox.UseVisualStyleBackColor = True
+        '
+        'ADCContinuousButton
+        '
+        Me.ADCContinuousButton.Location = New System.Drawing.Point(909, 270)
+        Me.ADCContinuousButton.Name = "ADCContinuousButton"
+        Me.ADCContinuousButton.Size = New System.Drawing.Size(132, 68)
+        Me.ADCContinuousButton.TabIndex = 18
+        Me.ADCContinuousButton.Text = "ADC free run "
+        Me.ADCContinuousButton.UseVisualStyleBackColor = True
+        '
+        'ADCOnceButton
+        '
+        Me.ADCOnceButton.Location = New System.Drawing.Point(909, 376)
+        Me.ADCOnceButton.Name = "ADCOnceButton"
+        Me.ADCOnceButton.Size = New System.Drawing.Size(132, 59)
+        Me.ADCOnceButton.TabIndex = 19
+        Me.ADCOnceButton.Text = "Button1"
+        Me.ADCOnceButton.UseVisualStyleBackColor = True
+        '
+        'AllDataTextBox
+        '
+        Me.AllDataTextBox.Location = New System.Drawing.Point(486, 331)
+        Me.AllDataTextBox.Name = "AllDataTextBox"
+        Me.AllDataTextBox.Size = New System.Drawing.Size(386, 26)
+        Me.AllDataTextBox.TabIndex = 21
+        '
+        'VoltageTextBox
+        '
+        Me.VoltageTextBox.Location = New System.Drawing.Point(465, 105)
+        Me.VoltageTextBox.Name = "VoltageTextBox"
+        Me.VoltageTextBox.Size = New System.Drawing.Size(221, 26)
+        Me.VoltageTextBox.TabIndex = 22
+        '
+        'TemperatureTextBox
+        '
+        Me.TemperatureTextBox.Location = New System.Drawing.Point(465, 152)
+        Me.TemperatureTextBox.Name = "TemperatureTextBox"
+        Me.TemperatureTextBox.Size = New System.Drawing.Size(221, 26)
+        Me.TemperatureTextBox.TabIndex = 23
+        '
         'SerialPortForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1063, 469)
+        Me.Controls.Add(Me.TemperatureTextBox)
+        Me.Controls.Add(Me.VoltageTextBox)
+        Me.Controls.Add(Me.AllDataTextBox)
+        Me.Controls.Add(Me.ADCOnceButton)
+        Me.Controls.Add(Me.ADCContinuousButton)
+        Me.Controls.Add(Me.ADCCheckBox)
         Me.Controls.Add(Me.ClearServoButton)
         Me.Controls.Add(Me.ClearADCButton)
         Me.Controls.Add(Me.ServoDataLabel)
@@ -271,4 +332,10 @@ Partial Class SerialPortForm
     Friend WithEvents ClearADCButton As Button
     Friend WithEvents ClearServoButton As Button
     Friend WithEvents ADCTimer As Timer
+    Friend WithEvents ADCCheckBox As CheckBox
+    Friend WithEvents ADCContinuousButton As Button
+    Friend WithEvents ADCOnceButton As Button
+    Friend WithEvents AllDataTextBox As TextBox
+    Friend WithEvents VoltageTextBox As TextBox
+    Friend WithEvents TemperatureTextBox As TextBox
 End Class
